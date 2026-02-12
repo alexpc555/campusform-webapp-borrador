@@ -1,0 +1,94 @@
+<div class="page">
+  <div class="container">
+
+    <!-- Logo -->
+    <a class="brand" routerLink="/">
+      <img class="brand__logo" src="assets/images/logo_buap.png" alt="BUAP Logo" />
+      <span class="brand__name">CampusForum</span>
+    </a>
+
+    <!-- Card -->
+    <div class="card">
+      <div class="card__head">
+        <h1>Iniciar Sesión</h1>
+        <p>Accede con tu correo institucional</p>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="submit()" class="form">
+
+        <!-- Email -->
+        <mat-form-field appearance="fill" floatLabel="always" class="full">
+          <mat-label>Correo Institucional</mat-label>
+          <mat-icon matPrefix>mail</mat-icon>
+
+          <input
+            matInput
+            type="email"
+            placeholder="ejemplo@alumno.buap.mx"
+            formControlName="email"
+          />
+
+          <mat-error *ngIf="email?.touched && email?.hasError('required')">
+            El correo es requerido
+          </mat-error>
+
+          <mat-error *ngIf="email?.touched && email?.hasError('institutionalEmail')">
+            Debe usar un correo institucional (@alumno.buap.mx, @buap.mx o @admin.buap.mx)
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Password: label + link -->
+        <div class="row">
+          <span class="label">Contraseña</span>
+          <button type="button" class="link" (click)="forgotPassword()">
+            ¿Olvidaste tu contraseña?
+          </button>
+        </div>
+
+        <!-- Password input -->
+        <mat-form-field appearance="fill" floatLabel="always" class="full">
+          <mat-label>Contraseña</mat-label>
+          <mat-icon matPrefix>lock</mat-icon>
+
+          <input
+            matInput
+            type="password"
+            placeholder="••••••••"
+            formControlName="password"
+          />
+
+          <mat-error *ngIf="password?.touched && password?.hasError('required')">
+            La contraseña es requerida
+          </mat-error>
+
+          <mat-error *ngIf="password?.touched && password?.hasError('minLengthTrim')">
+            La contraseña debe tener al menos 6 caracteres
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Button -->
+        <button
+          mat-raised-button
+          color="primary"
+          class="login-btn"
+          type="submit"
+          [disabled]="submitting"
+        >
+          {{ submitting ? 'Ingresando…' : 'Iniciar Sesión' }}
+        </button>
+      </form>
+
+      <div class="footer">
+        <span>¿No tienes cuenta?</span>
+        <!-- Como aún no tienes register, lo dejo apuntando a login o quítalo -->
+        <a routerLink="/register" class="link link--strong">Regístrate aquí</a>
+      </div>
+    </div>
+
+    <a routerLink="/" class="back">← Volver al inicio</a>
+
+    <p>entrar a la siguiente vista aun no hay logica</p>
+    <a routerLink="/dashboard" class="back">← vista dashboard</a>
+
+  </div>
+</div>

@@ -1,0 +1,111 @@
+<div class="page">
+  <div class="container">
+
+    <a class="brand" routerLink="/">
+      <img class="brand__logo" src="assets/images/logo_buap.png" alt="BUAP Logo" />
+      <span class="brand__name">CampusForum</span>
+    </a>
+
+    <div class="card">
+      <div class="card__head">
+        <h1>Crear Cuenta</h1>
+        <p>Únete a la comunidad académica</p>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="submit()" class="form">
+
+        <!-- Nombre -->
+        <div class="field">
+          <div class="field__label">Nombre Completo</div>
+
+          <mat-form-field appearance="fill" class="full field__control">
+            <mat-icon matPrefix>person</mat-icon>
+            <input matInput type="text" placeholder="Juan Pérez" formControlName="name" />
+            <mat-error *ngIf="name?.touched && name?.hasError('required')">
+              El nombre es requerido
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <!-- Email -->
+        <div class="field">
+          <div class="field__label">Correo Institucional</div>
+
+          <mat-form-field appearance="fill" class="full field__control">
+            <mat-icon matPrefix>mail</mat-icon>
+            <input matInput type="email" placeholder="ejemplo@alumno.buap.mx" formControlName="email" />
+
+            <mat-error *ngIf="email?.touched && email?.hasError('required')">
+              El correo es requerido
+            </mat-error>
+            <mat-error *ngIf="email?.touched && email?.hasError('institutionalEmailNoAdmin')">
+              Debe usar un correo institucional (@alumno.buap.mx o @buap.mx)
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <!-- Radio -->
+        <div class="field">
+          <div class="field__label">Tipo de Usuario</div>
+
+          <mat-radio-group formControlName="role" class="radio">
+            <mat-radio-button value="student">Estudiante</mat-radio-button>
+            <mat-radio-button value="teacher">Profesor</mat-radio-button>
+          </mat-radio-group>
+        </div>
+
+        <!-- Password -->
+        <div class="field">
+          <div class="field__label">Contraseña</div>
+
+          <mat-form-field appearance="fill" class="full field__control">
+            <mat-icon matPrefix>lock</mat-icon>
+            <input matInput type="password" placeholder="••••••••" formControlName="password" />
+
+            <mat-error *ngIf="password?.touched && password?.hasError('required')">
+              La contraseña es requerida
+            </mat-error>
+            <mat-error *ngIf="password?.touched && password?.hasError('minLengthTrim')">
+              La contraseña debe tener al menos 6 caracteres
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <!-- Confirm -->
+        <div class="field">
+          <div class="field__label">Confirmar Contraseña</div>
+
+          <mat-form-field appearance="fill" class="full field__control">
+            <mat-icon matPrefix>lock</mat-icon>
+            <input matInput type="password" placeholder="••••••••" formControlName="confirmPassword" />
+
+            <mat-error *ngIf="confirmPassword?.touched && confirmPassword?.hasError('required')">
+              Confirma tu contraseña
+            </mat-error>
+            <mat-error *ngIf="confirmPassword?.touched && confirmPassword?.hasError('fieldsMismatch')">
+              Las contraseñas no coinciden
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <button
+          mat-raised-button
+          color="primary"
+          class="action-btn"
+          type="submit"
+          [disabled]="submitting"
+        >
+          {{ submitting ? 'Creando…' : 'Crear Cuenta' }}
+        </button>
+      </form>
+
+      <div class="footer">
+        <span>¿Ya tienes cuenta?</span>
+        <a class="link link--strong" (click)="goLogin()">Inicia sesión aquí</a>
+      </div>
+    </div>
+
+    <a class="back" (click)="goHome()">← Volver al inicio</a>
+
+  </div>
+</div>
