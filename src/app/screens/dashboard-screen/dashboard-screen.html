@@ -1,0 +1,157 @@
+<div class="dashboard-root landing-root">
+  <!-- TOPBAR -->
+  <mat-toolbar class="navbar-glass sticky-top border-bottom">
+    <div class="brand-icon">
+      <mat-icon>school</mat-icon>
+    </div>
+
+    <span class="brand-name" style="margin-left: 10px;">CampusForum</span>
+
+    <span style="flex: 1 1 auto;"></span>
+
+    <!-- pill user -->
+    <span class="pill badge-soft" style="display:inline-flex; align-items:center; gap:8px;">
+      <mat-icon style="font-size:18px; width:18px; height:18px;">person</mat-icon>
+      {{ userType }}
+    </span>
+
+    <!-- icons right (solo visual por ahora) -->
+    <button mat-icon-button style="margin-left: 10px;">
+      <mat-icon>settings</mat-icon>
+    </button>
+
+    <button mat-icon-button>
+      <mat-icon>logout</mat-icon>
+    </button>
+  </mat-toolbar>
+
+  <mat-sidenav-container class="container" style="min-height: calc(100vh - 64px);">
+    <!-- SIDEBAR -->
+    <mat-sidenav mode="side" opened class="sidebar" style="width: 280px;">
+      <button mat-button class="nav-btn"
+        [class.active]="activeSection === 'Inicio'"
+        (click)="setSection('Inicio')">
+        <mat-icon>home</mat-icon>
+        Inicio
+      </button>
+
+      <button mat-button class="nav-btn"
+        [class.active]="activeSection === 'Mis Posts'"
+        (click)="setSection('Mis Posts')">
+        <mat-icon>chat</mat-icon>
+        Mis Posts
+      </button>
+
+      <button mat-button class="nav-btn"
+        [class.active]="activeSection === 'Populares'"
+        (click)="setSection('Populares')">
+        <mat-icon>trending_up</mat-icon>
+        Populares
+      </button>
+
+      <button mat-button class="nav-btn"
+        [class.active]="activeSection === 'Guardados'"
+        (click)="setSection('Guardados')">
+        <mat-icon>bookmark</mat-icon>
+        Guardados
+      </button>
+
+      <!-- CATEGORÍAS -->
+      <div style="margin-top: 24px; padding: 0 12px;">
+        <div style="font-weight:800; color:#6c757d; letter-spacing:.06em; font-size:12px; margin: 10px 0;">
+          CATEGORÍAS
+        </div>
+
+        <button mat-button class="nav-btn"
+          [class.active]="activeCategory === 'Todas'"
+          (click)="setCategory('Todas')">
+          Todas
+        </button>
+
+        <button mat-button class="nav-btn"
+          [class.active]="activeCategory === 'Matemáticas'"
+          (click)="setCategory('Matemáticas')">
+          Matemáticas
+        </button>
+
+        <button mat-button class="nav-btn"
+          [class.active]="activeCategory === 'Programación'"
+          (click)="setCategory('Programación')">
+          Programación
+        </button>
+
+        <button mat-button class="nav-btn"
+          [class.active]="activeCategory === 'Física'"
+          (click)="setCategory('Física')">
+          Física
+        </button>
+
+        <button mat-button class="nav-btn"
+          [class.active]="activeCategory === 'Campus'"
+          (click)="setCategory('Campus')">
+          Campus
+        </button>
+      </div>
+    </mat-sidenav>
+
+    <!-- CONTENT -->
+    <mat-sidenav-content class="content" style="padding: 28px;">
+      <div style="max-width: 1100px; margin: 0 auto;">
+
+        <!-- BREADCRUMB -->
+        <div style="color:#6c757d; font-size: 16px; margin-bottom: 18px;">
+          Inicio <span class="dot">›</span> Dashboard <span class="dot">›</span> {{ activeCategory || 'Todas' }}
+        </div>
+
+        <!-- HEADER -->
+        <div class="content-header"
+             style="display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom: 18px;">
+          <div>
+            <h1 class="section-title" style="font-size: 44px; margin: 0;">
+              Feed de Publicaciones
+            </h1>
+            <p class="section-subtitle" style="margin: 6px 0 0;">
+              0 publicaciones encontradas
+            </p>
+          </div>
+
+          <button mat-flat-button color="primary" style="border-radius: 14px; padding: 10px 18px;">
+            <mat-icon style="margin-right:8px;">add</mat-icon>
+            Nueva Publicación
+          </button>
+        </div>
+
+        <!-- SEARCH + ORDER -->
+        <div class="glass-card" style="padding: 18px; margin-bottom: 18px;">
+          <div style="display:flex; gap:16px; align-items:center; flex-wrap:wrap;">
+            <mat-form-field appearance="outline" style="flex: 1 1 520px;">
+              <mat-label>Buscar publicaciones...</mat-label>
+              <mat-icon matPrefix>search</mat-icon>
+              <input matInput [(ngModel)]="searchQuery">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" style="width: 240px;">
+              <mat-label>Ordenar por</mat-label>
+              <mat-select [(ngModel)]="sortBy">
+                <mat-option value="recent">Más recientes</mat-option>
+                <mat-option value="popular">Más populares</mat-option>
+                <mat-option value="comments">Más comentados</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- POSTS (VACÍO POR AHORA) -->
+        <div class="glass-card empty-state" style="padding: 28px; text-align:center;">
+          <div class="empty-icon">🗂️</div>
+          <h3 style="margin: 10px 0 6px; font-weight: 900; color:#0b2f5b;">
+            Aún no hay publicaciones
+          </h3>
+          <p style="margin:0; color:#6c757d;">
+          </p>
+        </div>
+
+      </div>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>
