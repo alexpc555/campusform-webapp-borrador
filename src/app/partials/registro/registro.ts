@@ -3,6 +3,7 @@ import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { SHARED_IMPORTS } from '../../shared/shared.imports';
 import { ValidatorServices } from '../../services/tools/validator.services';
+import { AuthService } from '../../services/auth.services';
 
 type Role = 'student' | 'teacher';
 
@@ -20,7 +21,8 @@ export class Registro {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private validators: ValidatorServices
+    private validators: ValidatorServices,
+    private auth: AuthService
   ) {
     this.form = this.fb.group(
       {
@@ -48,19 +50,24 @@ export class Registro {
 
     this.submitting = true;
 
-    const role = this.form.value.role as Role;
-    const userType = role === 'student' ? 'Alumno' : 'Profesor';
+    const payload = {
+      name: (this.form.value.name || '').trim(),
+      email: (this.form.value.email || '').trim(),
+      password: (this.form.value.password || '').trim(),
+      role: this.form.value.role as Role,
+    };
 
-    // Mock: guardar y mandar a login (o dashboard cuando exista)
-    localStorage.setItem('userType', userType);
-    localStorage.setItem('userEmail', (this.form.value.email || '').trim());
-    localStorage.setItem('userName', (this.form.value.name || '').trim());
-
-    setTimeout(() => {
-      this.submitting = false;
-      // Como aún no hay dashboard, te mando a login
-      this.router.navigate(['/login']);
-    }, 500);
+    this.auth.register(payload).subscribe({
+      next: () => {
+        this.submitting = false;
+        this.router.navigate(['/login']);
+      },
+      error: (err) => {
+        this.submitting = false;
+        // aquí puedes mostrar un mat-snack-bar o mat-error global
+        console.error('Error register:', err?.error || err);
+      }
+    });
   }
 
   goLogin() {

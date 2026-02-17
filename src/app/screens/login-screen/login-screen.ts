@@ -42,7 +42,7 @@ export class LoginScreen {
 
     setTimeout(() => {
       this.submitting = false;
-      alert('Login válido (mock). Después aquí conectas tu AuthService.');
+      alert('Login válido pendiente');
     }, 400);
     
   }
