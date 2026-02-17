@@ -2,8 +2,6 @@ import { Component } from '@angular/core';
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { SHARED_IMPORTS } from '../../shared/shared.imports';
 import { ValidatorServices } from '../../services/tools/validator.services';
-import { Router } from '@angular/router';
-
 
 @Component({
   selector: 'app-login-screen',
@@ -18,8 +16,7 @@ export class LoginScreen {
 
   constructor(
     private fb: FormBuilder,
-    private validators: ValidatorServices,
-    private router: Router
+    private validators: ValidatorServices
   ) {
     this.form = this.fb.group({
       email: ['', [Validators.required, this.validators.institutionalEmail()]],
@@ -35,23 +32,18 @@ export class LoginScreen {
 }
 
 
-submit() {
-  if (this.form.invalid) {
-    this.form.markAllAsTouched();
-    return;
+  submit() {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
+    this.submitting = true;
+
+    setTimeout(() => {
+      this.submitting = false;
+      alert('Login válido pendiente');
+    }, 400);
+    
   }
-
-  this.submitting = true;
-
-  setTimeout(() => {
-    this.submitting = false;
-
-
-    localStorage.setItem('userType', 'Alumno');
-
-    // mandar al dashboard
-    this.router.navigate(['/dashboard']);
-  }, 400);
-}
-
 }
