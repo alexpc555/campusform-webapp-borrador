@@ -1,0 +1,172 @@
+<div class="analytics-root">
+
+  <!-- Navbar -->
+  <nav class="navbar-glass">
+    <div class="container d-flex justify-content-between align-items-center">
+
+      <a routerLink="/dashboard" class="brand">
+        <div class="brand-icon">
+          <i class="bi bi-mortarboard-fill"></i>
+        </div>
+        <span class="brand-text">CampusForum</span>
+      </a>
+<div class="d-flex gap-2">
+
+  <a routerLink="/Profesor" class="btn btn-outline-primary">
+    Panel Profesor
+  </a>
+
+  <a routerLink="/" class="btn btn-light icon-btn" aria-label="Configuración">
+    <i class="bi bi-gear"></i>
+  </a>
+
+  <a routerLink="/" class="btn btn-light icon-btn" aria-label="Cerrar sesión">
+    <i class="bi bi-box-arrow-right"></i>
+  </a>
+
+</div>
+
+</div>
+</nav>
+  <!-- Content -->
+  <div class="container py-4">
+
+    <!-- Header -->
+    <div class="mb-4">
+
+      <h1 class="page-title">
+        Analytics Dashboard
+      </h1>
+
+      <p class="page-subtitle">
+        Métricas y estadísticas de la plataforma CampusForum
+      </p>
+
+    </div>
+
+
+    <!-- Stats -->
+    <div class="row g-4 mb-4">
+
+      <div class="col-md-3" *ngFor="let stat of stats">
+
+        <div class="glass-card p-3">
+
+          <div class="d-flex justify-content-between align-items-center">
+
+            <div>
+
+              <div class="stat-label">
+                {{stat.label}}
+              </div>
+
+              <div class="stat-value">
+                {{stat.value}}
+              </div>
+
+              <div class="stat-growth text-success">
+                {{stat.growth}}
+              </div>
+
+            </div>
+
+            <div class="stat-icon">
+              <i class="{{stat.icon}}"></i>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- Charts -->
+    <div class="row g-4">
+
+      <div class="col-lg-6">
+
+        <div class="glass-card p-3">
+
+          <h5>Publicaciones por Categoría</h5>
+
+          <canvas id="postsChart"></canvas>
+
+        </div>
+
+      </div>
+
+
+      <div class="col-lg-6">
+
+        <div class="glass-card p-3">
+
+          <h5>Usuarios Activos</h5>
+
+          <canvas id="usersChart"></canvas>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- Table -->
+    <div class="glass-card p-4 mt-4">
+
+      <h5 class="mb-3">
+        Métricas Detalladas
+      </h5>
+
+      <div class="row">
+
+        <div class="col-md-4">
+
+          <div class="metric-value">
+            5.3
+          </div>
+
+          <div class="metric-label">
+            Promedio comentarios por post
+          </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+          <div class="metric-value">
+            2.4h
+          </div>
+
+          <div class="metric-label">
+            Tiempo promedio respuesta
+          </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+          <div class="metric-value">
+            78%
+          </div>
+
+          <div class="metric-label">
+            Engagement
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+  </div> <!-- container -->
+
+
+</div> <!-- analytics-root -->
