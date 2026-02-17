@@ -8,7 +8,7 @@ import { AnalyticsPageComponent } from './screens/analytics-page/analytics-page'
 
 export const routes: Routes = [
 
-  { path: '', component: LandigPage, pathMatch: 'full' },
+  { path: '', component: LandigPage },
 
   { path: 'login', component: LoginScreen },
 
@@ -18,6 +18,6 @@ export const routes: Routes = [
 
   { path: 'analytics-page', component: AnalyticsPageComponent },
 
-  { path: '**', redirectTo: '' },
+  { path: '**', redirectTo: '' }
 
 ];
