@@ -5,6 +5,7 @@ import { LoginScreen } from './screens/login-screen/login-screen';
 import { Registro } from './partials/registro/registro';
 import { ProfesorScreen } from './screens/profesor-screen/profesor-screen';
 import { AnalyticsPageComponent } from './screens/analytics-page/analytics-page';
+import { DashboardScreen } from './screens/dashboard-screen/dashboard-screen';
 
 export const routes: Routes = [
 
@@ -17,6 +18,8 @@ export const routes: Routes = [
   { path: 'profesor', component: ProfesorScreen },
 
   { path: 'analytics-page', component: AnalyticsPageComponent },
+
+  {path: 'dashboard',component: DashboardScreen},
 
   { path: '**', redirectTo: '' }
 
