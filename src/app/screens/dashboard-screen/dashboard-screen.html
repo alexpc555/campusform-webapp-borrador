@@ -115,10 +115,10 @@
             </p>
           </div>
 
-          <button mat-flat-button color="primary" style="border-radius: 14px; padding: 10px 18px;">
-            <mat-icon style="margin-right:8px;">add</mat-icon>
-            Nueva Publicación
+          <button mat-flat-button color="primary" (click)="openNewPostModal()">
+            Nueva publicación
           </button>
+
         </div>
 
         <!-- SEARCH + ORDER -->
@@ -155,3 +155,5 @@
     </mat-sidenav-content>
   </mat-sidenav-container>
 </div>
+
+
