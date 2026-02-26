@@ -98,3 +98,167 @@
   padding: 0.35rem 0.6rem;
   font-weight: 700;
 }
+:host { display: block; }
+
+/* ====== Base ====== */
+.dashboard-root {
+  min-height: 100vh;
+  background: radial-gradient(1200px 600px at 10% 10%, rgba(13, 110, 253, 0.08), transparent 60%),
+              radial-gradient(1200px 600px at 90% 20%, rgba(25, 135, 84, 0.08), transparent 55%),
+              linear-gradient(135deg, rgba(13, 110, 253, 0.03), rgba(25, 135, 84, 0.04));
+}
+
+.navbar-glass {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.10);
+}
+
+.brand-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: #0b2f5b;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+.brand-name {
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: #0b2f5b;
+}
+
+/* Importante: que el contenedor no se corte raro en mobile */
+.container {
+  height: calc(100vh - 64px);
+}
+
+/* Sidebar */
+.sidebar {
+  width: 260px;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.70);
+  backdrop-filter: blur(14px);
+  border-right: 1px solid rgba(15, 23, 42, 0.10);
+}
+
+.nav-btn {
+  width: 100%;
+  justify-content: flex-start;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-weight: 700;
+  color: #334155;
+}
+.nav-btn mat-icon { margin-right: 10px; }
+
+.nav-btn.active {
+  background: rgba(13, 110, 253, 0.10);
+  color: #0d6efd;
+}
+
+.section-title {
+  font-weight: 900;
+  color: #0b2f5b;
+  letter-spacing: -0.02em;
+}
+
+/* Cards */
+.glass-card {
+  background: rgba(255, 255, 255, 0.76);
+  border: 1px solid rgba(15, 23, 42, 0.10);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.06);
+  backdrop-filter: blur(14px);
+  border-radius: 22px;
+}
+
+/* Evita overflow horizontal por sombras/paddings */
+.content {
+  padding: 22px;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.content-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 16px;
+
+  /* clave para que el título/botones no “empujen” */
+  flex-wrap: wrap;
+}
+
+.pill {
+  border: 1px solid rgba(15, 23, 42, 0.18);
+  background: rgba(255, 255, 255, 0.55);
+  color: #334155;
+  border-radius: 999px;
+  padding: 0.35rem 0.6rem;
+  font-weight: 700;
+}
+
+/* ====== Responsive ====== */
+
+/* Laptop/desktop medianos: un poco más compacto */
+@media (max-width: 1200px) {
+  .sidebar { width: 240px; }
+  .content { padding: 18px; }
+  .glass-card { border-radius: 20px; }
+}
+
+/* Tablet: sidebar más angosta y espaciado menor */
+@media (max-width: 992px) {
+  .container { height: auto; min-height: calc(100vh - 64px); }
+
+  .sidebar { width: 220px; padding: 12px; }
+  .content { padding: 16px; }
+  .brand-name { font-size: 1.05rem; }
+}
+
+/* Móvil: sidebar pasa a ocupar todo el ancho (tipo barra superior) */
+@media (max-width: 768px) {
+  .container { height: auto; min-height: calc(100vh - 64px); }
+
+  /* Si tu <mat-sidenav> está en mode="side", en móvil conviene que sea “normal”
+     (esto es del TS/HTML), pero CSS ayuda a que se vea bien si igual se muestra. */
+  .sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.10);
+    border-radius: 0 0 18px 18px;
+  }
+
+  /* Botones tipo grid para que no se hagan eternos */
+  .nav-btn {
+    padding: 10px 10px;
+    border-radius: 12px;
+  }
+
+  .content { padding: 14px; }
+  .glass-card { border-radius: 18px; }
+
+  /* Topbar: reduce un poco elementos */
+  .brand-icon { width: 36px; height: 36px; }
+  .brand-name { font-size: 1rem; }
+
+  /* Header del contenido: todo apilable */
+  .content-header {
+    align-items: flex-start;
+    gap: 10px;
+  }
+}
+
+/* Móvil chico */
+@media (max-width: 480px) {
+  .content { padding: 12px; }
+  .pill { font-size: 0.85rem; padding: 0.3rem 0.55rem; }
+  .brand-name { display: none; } /* opcional: si se te aprieta demasiado */
+}
