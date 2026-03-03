@@ -14,7 +14,7 @@
                     <i class="bi bi-person-circle"></i>
                     Alumno
                 </div>
-                <button class="btn btn-dashboard d-none d-sm-block">Dashboard</button>
+                <button class="btn btn-dashboard d-none d-sm-block" routerLink="/dashboard">Dashboard</button>
                 <button class="btn btn-icon"><i class="bi bi-gear"></i></button>
                 <button class="btn btn-icon"><i class="bi bi-box-arrow-right"></i></button>
             </div>
@@ -96,7 +96,7 @@
             @if (activeTab === 'reports') {
             <div class="section-header">
                 <h3>Mis Reportes</h3>
-                <button class="btn btn-primary d-flex align-items-center gap-2">
+                <button class="btn btn-primary d-flex align-items-center gap-2" (click)="openNewReportModal()">
                     <i class="bi bi-flag"></i> Nuevo Reporte
                 </button>
             </div>
@@ -170,6 +170,64 @@
             <div class="modal-footer-custom">
                 <button class="btn btn-cancel" (click)="closeNewPostModal()">Cancelar</button>
                 <button class="btn btn-publish" (click)="publishPost()">Publicar</button>
+            </div>
+        </div>
+    </div>
+    }
+
+    <!-- Modal Reportar Contenido Inapropiado -->
+    @if (showNewReportModal) {
+    <div class="modal-overlay" (click)="closeNewReportModal()">
+        <div class="modal-card" (click)="$event.stopPropagation()">
+            <div class="modal-header-custom">
+                <div>
+                    <h3>Reportar Contenido Inapropiado</h3>
+                    <p class="modal-subtitle">Ayúdanos a mantener la comunidad segura reportando contenido que viole las
+                        normas</p>
+                </div>
+                <button class="btn-close-modal" (click)="closeNewReportModal()">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <div class="modal-body-custom">
+                <div class="form-group-custom">
+                    <label>Tipo de contenido <span class="required">*</span></label>
+                    <select class="form-input-custom form-select-custom" [(ngModel)]="newReport.contentType">
+                        <option value="" disabled selected>Selecciona un tipo</option>
+                        @for (type of contentTypes; track type) {
+                        <option [value]="type">{{ type }}</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="form-group-custom">
+                    <label>Título del contenido <span class="required">*</span></label>
+                    <input type="text" class="form-input-custom" placeholder="Ej: Post sobre venta de productos"
+                        [(ngModel)]="newReport.contentTitle">
+                </div>
+
+                <div class="form-group-custom">
+                    <label>Razón del reporte <span class="required">*</span></label>
+                    <select class="form-input-custom form-select-custom" [(ngModel)]="newReport.reason">
+                        <option value="" disabled selected>Selecciona una razón</option>
+                        @for (reason of reportReasons; track reason) {
+                        <option [value]="reason">{{ reason }}</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="form-group-custom">
+                    <label>Descripción detallada <span class="required">*</span></label>
+                    <textarea class="form-input-custom form-textarea"
+                        placeholder="Explica por qué estás reportando este contenido..."
+                        [(ngModel)]="newReport.description"></textarea>
+                </div>
+            </div>
+
+            <div class="modal-footer-custom">
+                <button class="btn btn-cancel" (click)="closeNewReportModal()">Cancelar</button>
+                <button class="btn btn-publish" (click)="submitReport()">Enviar Reporte</button>
             </div>
         </div>
     </div>

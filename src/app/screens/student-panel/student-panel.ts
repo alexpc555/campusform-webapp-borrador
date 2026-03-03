@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 
 interface Publication {
     id: number;
@@ -31,13 +32,14 @@ interface Report {
 @Component({
     selector: 'app-student-panel',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, RouterModule],
     templateUrl: './student-panel.html',
     styleUrl: './student-panel.scss'
 })
 export class StudentPanelComponent {
     activeTab: 'posts' | 'comments' | 'reports' = 'comments';
     showNewPostModal = false;
+    showNewReportModal = false;
 
     newPost = {
         title: '',
@@ -52,6 +54,27 @@ export class StudentPanelComponent {
         'Programación',
         'Idiomas',
         'General'
+    ];
+
+    newReport = {
+        contentType: '',
+        contentTitle: '',
+        reason: '',
+        description: ''
+    };
+
+    contentTypes = [
+        'Publicación',
+        'Comentario',
+        'Usuario'
+    ];
+
+    reportReasons = [
+        'Spam o publicidad',
+        'Contenido ofensivo',
+        'Información falsa',
+        'Acoso o intimidación',
+        'Otro'
     ];
 
     myPosts: Publication[] = [];
@@ -114,5 +137,35 @@ export class StudentPanelComponent {
 
         this.myPosts.unshift(post);
         this.closeNewPostModal();
+    }
+
+    openNewReportModal() {
+        this.showNewReportModal = true;
+    }
+
+    closeNewReportModal() {
+        this.showNewReportModal = false;
+        this.newReport = { contentType: '', contentTitle: '', reason: '', description: '' };
+    }
+
+    submitReport() {
+        if (!this.newReport.contentType || !this.newReport.contentTitle.trim() || !this.newReport.reason || !this.newReport.description.trim()) {
+            return;
+        }
+
+        const now = new Date();
+        const report: Report = {
+            id: this.myReports.length + 1,
+            type: this.newReport.contentType,
+            status: 'Pendiente',
+            title: this.newReport.contentTitle,
+            reason: this.newReport.reason,
+            description: this.newReport.description,
+            date: now.toISOString().split('T')[0],
+            timeAgo: 'Ahora'
+        };
+
+        this.myReports.unshift(report);
+        this.closeNewReportModal();
     }
 }
