@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, HostListener, ViewChild } from '@angular/core';
 import { SHARED_IMPORTS } from '../../shared/shared.imports';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSidenav } from '@angular/material/sidenav';
 import { NewPostModal } from '../../partials/new-post-modal/new-post-modal';
 
 @Component({
@@ -11,24 +12,57 @@ import { NewPostModal } from '../../partials/new-post-modal/new-post-modal';
   styleUrl: './dashboard-screen.scss',
 })
 export class DashboardScreen {
+
   activeSection = 'Inicio';
   activeCategory = 'Todas';
 
-  // ✅ para tu [(ngModel)]
+
   searchQuery = '';
   sortBy: 'recent' | 'popular' | 'comments' = 'recent';
 
   userType = localStorage.getItem('userType') || 'Alumno';
 
+
+  @ViewChild('sidenav') sidenav!: MatSidenav;
+
+  isMobile = window.innerWidth <= 768;
+
   constructor(private dialog: MatDialog) {}
 
+  @HostListener('window:resize')
+  onResize() {
+    const nowMobile = window.innerWidth <= 768;
+
+    // si cambia el modo, ajusta el sidenav
+    if (nowMobile !== this.isMobile) {
+      this.isMobile = nowMobile;
+
+      // en desktop: abierto; en móvil: cerrado
+      if (this.sidenav) {
+        this.isMobile ? this.sidenav.close() : this.sidenav.open();
+      }
+    }
+  }
+
+  toggleSidenav() {
+    if (this.isMobile && this.sidenav) this.sidenav.toggle();
+  }
+
+  closeIfMobile() {
+    if (this.isMobile && this.sidenav) this.sidenav.close();
+  }
+
+  // ====== Navegación ======
   setSection(section: string) {
     this.activeSection = section;
+    this.closeIfMobile();
   }
 
   setCategory(category: string) {
     this.activeCategory = category;
+    this.closeIfMobile();
   }
+
 
   openNewPostModal() {
     const dialogRef = this.dialog.open(NewPostModal, {
