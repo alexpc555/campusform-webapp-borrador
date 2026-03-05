@@ -1,125 +1,163 @@
-<div class="panel-root">
-
-    <nav class="navbar navbar-expand-lg fixed-top navbar-glass">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">
+<div class="landing-root">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-glass sticky-top border-bottom">
+        <div class="container py-2 position-relative">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="#">
                 <span class="brand-icon">
                     <i class="bi bi-mortarboard-fill"></i>
                 </span>
-                CampusForum
+                <span class="brand-name">CampusForum</span>
             </a>
 
-            <div class="nav-actions ms-auto">
-                <div class="badge-role">
-                    <i class="bi bi-person-circle"></i>
-                    Alumno
+            <div class="ms-auto d-flex align-items-center gap-2">
+                <div class="badge-role me-2">
+                    <i class="bi bi-person-circle"></i> <span class="d-none d-sm-inline ms-1">Alumno</span>
                 </div>
-                <button class="btn btn-dashboard d-none d-sm-block" routerLink="/dashboard">Dashboard</button>
-                <button class="btn btn-icon"><i class="bi bi-gear"></i></button>
-                <button class="btn btn-icon"><i class="bi bi-box-arrow-right"></i></button>
+                <button class="btn btn-outline-primary d-none d-sm-block me-1"
+                    routerLink="/dashboard">Dashboard</button>
+                <button class="btn btn-link text-muted text-decoration-none" type="button" title="Settings">
+                    <i class="bi bi-gear fs-5"></i>
+                </button>
+                <button class="btn btn-link text-muted text-decoration-none" type="button" title="Logout">
+                    <i class="bi bi-box-arrow-right fs-5"></i>
+                </button>
             </div>
         </div>
     </nav>
 
-    <div class="container main-content">
-        <h1>Panel de Alumno</h1>
-        <p class="subtitle">Gestiona tus publicaciones, comentarios y reportes</p>
+    <div class="container py-5">
+        <div class="mb-4">
+            <h1 class="section-title display-6 mb-2">Panel de Alumno</h1>
+            <p class="section-subtitle mb-0">Gestiona tus publicaciones, comentarios y reportes</p>
+        </div>
 
+        <!-- Tabs estilo wireframe -->
+        <div class="glass-card tabs-glass p-2 mb-4">
+            <button class="tab-btn" [class.active]="activeTab === 'posts'" (click)="setActiveTab('posts')">
+                Mis Posts
+                <span class="tab-pill tab-pill-primary">{{ myPosts.length }}</span>
+            </button>
 
-        <div class="nav-pills-glass">
-            <button class="nav-link" [class.active]="activeTab === 'posts'" (click)="setActiveTab('posts')">
-                Mis Posts <span class="badge bg-primary rounded-pill">{{ myPosts.length }}</span>
+            <button class="tab-btn" [class.active]="activeTab === 'comments'" (click)="setActiveTab('comments')">
+                Comentarios
+                <span class="tab-pill tab-pill-primary">{{ myComments.length }}</span>
             </button>
-            <button class="nav-link" [class.active]="activeTab === 'comments'" (click)="setActiveTab('comments')">
-                Comentarios <span class="badge bg-primary rounded-pill">{{ myComments.length }}</span>
-            </button>
-            <button class="nav-link" [class.active]="activeTab === 'reports'" (click)="setActiveTab('reports')">
-                Mis Reportes <span class="badge bg-warning text-dark rounded-pill">{{ myReports.length }}</span>
+
+            <button class="tab-btn" [class.active]="activeTab === 'reports'" (click)="setActiveTab('reports')">
+                Mis Reportes
+                <span class="tab-pill tab-pill-warn">{{ myReports.length }}</span>
             </button>
         </div>
 
-
-        <div class="glass-card">
-
-
-            @if (activeTab === 'posts') {
-            <div class="section-header">
-                <h3>Mis Publicaciones</h3>
-                <button class="btn btn-primary d-flex align-items-center gap-2" (click)="openNewPostModal()">
-                    <i class="bi bi-plus-lg"></i> Nuevo Post
+        <!-- POSTS -->
+        @if (activeTab === 'posts') {
+        <div class="glass-card p-3 p-md-4 p-lg-5">
+            <div
+                class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3 mb-4">
+                <div>
+                    <h2 class="section-title h4 mb-1">Mis Publicaciones</h2>
+                    <p class="section-subtitle mb-0">Administra todas tus publicaciones</p>
+                </div>
+                <button class="btn btn-primary" (click)="openNewPostModal()">
+                    <i class="bi bi-plus-lg me-2"></i> Nuevo Post
                 </button>
             </div>
 
             @if (myPosts.length === 0) {
-            <div class="empty-state">
-                <i class="bi bi-chat-square-text"></i>
-                <p>Aún no tienes publicaciones</p>
-                <button class="btn btn-primary mt-2" (click)="openNewPostModal()">
+            <div class="empty-state text-center py-5">
+                <div class="empty-icon mb-2"><i class="bi bi-chat-square-dots"></i></div>
+                <div class="section-subtitle mb-3">Aún no tienes publicaciones</div>
+                <button class="btn btn-primary" (click)="openNewPostModal()">
                     <i class="bi bi-plus-lg me-1"></i> Crear mi primer post
                 </button>
             </div>
             } @else {
             <!-- List of posts would go here -->
             }
-            }
+        </div>
+        }
 
-
-            @if (activeTab === 'comments') {
-            <div class="section-header">
-                <h3>Mis Comentarios</h3>
+        <!-- COMMENTS -->
+        @if (activeTab === 'comments') {
+        <div class="glass-card p-3 p-md-4 p-lg-5">
+            <div class="d-flex align-items-center justify-content-between gap-3 mb-4">
+                <h2 class="section-title h4 mb-0">Mis Comentarios</h2>
             </div>
 
-            <div class="comment-list">
+            <div class="d-grid gap-3">
                 @for (comment of myComments; track comment.id) {
-                <div class="item-card">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <div class="item-title">
-                                <i class="bi bi-chat-left-text"></i>
+                <div class="glass-card p-4 hover-lift">
+                    <div class="d-flex flex-column flex-lg-row gap-3 justify-content-between">
+                        <div class="flex-grow-1">
+                            <h3 class="h5 fw-bold mb-2 d-flex align-items-center gap-2">
+                                <i class="bi bi-chat-left-text text-muted"></i>
                                 {{ comment.postTitle }}
-                            </div>
-                            <p class="text-secondary mb-2">{{ comment.content }}</p>
-                            <div class="item-meta">
-                                <i class="bi bi-calendar3"></i> {{ comment.timeAgo }}
+                            </h3>
+                            <p class="text-muted mb-3">{{ comment.content }}</p>
+                            <div class="text-muted small d-flex flex-wrap gap-2 align-items-center">
+                                <i class="bi bi-calendar3"></i> <span>{{ comment.timeAgo }}</span>
                             </div>
                         </div>
-                        <button class="btn btn-outline-secondary btn-sm">
-                            <i class="bi bi-eye"></i> Ver Post
-                        </button>
+                        <div class="d-flex gap-2 align-items-start justify-content-end flex-wrap">
+                            <button class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-eye me-1"></i> Ver Post
+                            </button>
+                        </div>
                     </div>
                 </div>
                 }
             </div>
-            }
+        </div>
+        }
 
-
-            @if (activeTab === 'reports') {
-            <div class="section-header">
-                <h3>Mis Reportes</h3>
-                <button class="btn btn-primary d-flex align-items-center gap-2" (click)="openNewReportModal()">
-                    <i class="bi bi-flag"></i> Nuevo Reporte
+        <!-- REPORTS -->
+        @if (activeTab === 'reports') {
+        <div class="glass-card p-3 p-md-4 p-lg-5">
+            <div
+                class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3 mb-4">
+                <div>
+                    <h2 class="section-title h4 mb-0">Mis Reportes</h2>
+                </div>
+                <button class="btn btn-primary" (click)="openNewReportModal()">
+                    <i class="bi bi-flag me-2"></i> Nuevo Reporte
                 </button>
             </div>
 
-            <div class="report-list">
+            <div class="d-grid gap-3">
                 @for (report of myReports; track report.id) {
-                <div class="item-card">
-                    <div class="mb-3 d-flex align-items-center">
-                        <span class="badge border text-dark me-2">{{ report.type }}</span>
-                        <span class="badge-status">{{ report.status }}</span>
-                    </div>
-                    <h5 class="fw-bold mb-1" style="color: #1e293b;">{{ report.title }}</h5>
-                    <div class="text-muted small mb-2">Razón: {{ report.reason }}</div>
-                    <p class="text-secondary mb-3">{{ report.description }}</p>
-                    <div class="item-meta">
-                        <i class="bi bi-calendar3"></i> {{ report.timeAgo }}
+                <div class="glass-card p-4 hover-lift">
+                    <div class="d-flex flex-column flex-lg-row gap-3 justify-content-between">
+                        <div class="flex-grow-1">
+                            <div class="d-flex flex-wrap gap-2 mb-2">
+                                <span class="badge badge-outline">
+                                    {{ report.type }}
+                                </span>
+                                <span class="status-pill badge-resolved" *ngIf="report.status==='Resuelto'">
+                                    <i class="bi bi-check-circle"></i> <span class="ms-1">{{ report.status }}</span>
+                                </span>
+                                <span class="status-pill badge-pending" *ngIf="report.status==='Pendiente'">
+                                    <i class="bi bi-clock"></i> <span class="ms-1">{{ report.status }}</span>
+                                </span>
+                                <span class="status-pill badge-dismissed" *ngIf="report.status==='Rechazado'">
+                                    <i class="bi bi-x-circle"></i> <span class="ms-1">{{ report.status }}</span>
+                                </span>
+                            </div>
+                            <h3 class="h5 fw-bold mb-2">{{ report.title }}</h3>
+                            <div class="text-muted mb-2">
+                                <b class="text-dark">Razón:</b> {{ report.reason }}
+                            </div>
+                            <p class="text-muted mb-3">{{ report.description }}</p>
+                            <div class="text-muted small d-flex flex-wrap gap-2 align-items-center">
+                                <i class="bi bi-calendar3"></i> <span>{{ report.timeAgo }}</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 }
             </div>
-            }
-
         </div>
+        }
+
     </div>
 
     <!-- Modal Crear Nueva Publicación -->
@@ -232,4 +270,5 @@
         </div>
     </div>
     }
+
 </div>
