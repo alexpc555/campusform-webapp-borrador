@@ -7,6 +7,10 @@ import { ProfesorScreen } from './screens/profesor-screen/profesor-screen';
 import { AnalyticsPageComponent } from './screens/analytics-page/analytics-page';
 import { DashboardScreen } from './screens/dashboard-screen/dashboard-screen';
 import { AdminScreen } from './screens/admin-screen/admin-screen';
+import { StudentPanelComponent } from './screens/student-panel/student-panel';
+import { GestionUsuario } from './screens/panel-admin-profesor-alumno/gestion-usuario/gestion-usuario';
+import { CategoriasAdministracion } from './screens/panel-admin-profesor-alumno/categorias-administracion/categorias-administracion';
+import { ReportesAdmin } from './screens/panel-admin-profesor-alumno/reportes-admin/reportes-admin';
 
 export const routes: Routes = [
 
@@ -20,10 +24,15 @@ export const routes: Routes = [
 
   { path: 'analytics-page', component: AnalyticsPageComponent },
 
-  {path: 'dashboard',component: DashboardScreen},
+  { path: 'dashboard', component: DashboardScreen },
 
   { path: 'admin', component: AdminScreen },
 
+  { path: 'student-panel', component: StudentPanelComponent },
+    
+  { path: 'admin/usuarios', component: GestionUsuario },
+  { path: 'admin/categorias', component: CategoriasAdministracion },
+  { path: 'admin/reportes', component: ReportesAdmin },
   { path: '**', redirectTo: '' }
 
 ];
