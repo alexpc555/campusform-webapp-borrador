@@ -1,1 +1,54 @@
-<p>reportes-profesor works!</p>
+<nav class="navbar navbar-expand-lg navbar-glass sticky-top border-bottom">
+  <div class="container py-2 position-relative">
+
+    <a class="navbar-brand d-flex align-items-center gap-2" routerLink="/">
+      <span class="brand-icon">
+        <i class="bi bi-mortarboard-fill"></i>
+      </span>
+      <span class="brand-name">CampusForum</span>
+    </a>
+
+    <div class="ms-auto d-flex align-items-center gap-2">
+
+      <button class="btn btn-outline-danger" (click)="volver()">
+        <i class="bi bi-arrow-left me-1"></i>
+        Volver
+      </button>
+
+    </div>
+
+  </div>
+</nav>
+
+
+<div class="reportes-wrapper">
+
+  <div class="report-header">
+
+    <h2>Reportes</h2>
+    <p>Resumen de actividad del profesor</p>
+
+  </div>
+
+
+  <div class="report-grid">
+
+    <div class="report-card" *ngFor="let reporte of reportes">
+
+      <h3 class="report-title">
+        {{reporte.titulo}}
+      </h3>
+
+      <p class="report-value">
+        {{reporte.valor}}
+      </p>
+
+      <span class="report-desc">
+        {{reporte.descripcion}}
+      </span>
+
+    </div>
+
+  </div>
+
+</div>
