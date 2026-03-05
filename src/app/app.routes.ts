@@ -10,6 +10,9 @@ import { AdminScreen } from './screens/admin-screen/admin-screen';
 import { StudentPanelComponent } from './screens/student-panel/student-panel';
 import { GestionUsuario } from './screens/panel-admin-profesor-alumno/gestion-usuario/gestion-usuario';
 import { CategoriasAdministracion } from './screens/panel-admin-profesor-alumno/categorias-administracion/categorias-administracion';
+import { CategoriasProfesor } from './screens/panel-admin-profesor-alumno/categorias-profesor/categorias-profesor';
+import { PostProfesor } from './screens/panel-admin-profesor-alumno/post-profesor/post-profesor';
+import { ReportesProfesor } from './screens/panel-admin-profesor-alumno/reportes-profesor/reportes-profesor';
 import { ReportesAdmin } from './screens/panel-admin-profesor-alumno/reportes-admin/reportes-admin';
 import { CategoriasScreen } from './screens/categorias/categorias-screen/categorias-screen';
 import { FisicaComponent } from './screens/categorias/fisica/fisica';
@@ -29,6 +32,9 @@ export const routes: Routes = [
   { path: 'register', component: Registro },
 
   { path: 'profesor', component: ProfesorScreen },
+  { path: 'profesor/post', component: PostProfesor },
+  { path: 'profesor/categorias', component: CategoriasProfesor },
+  { path: 'profesor/reportes', component: ReportesProfesor },
 
   { path: 'analytics-page', component: AnalyticsPageComponent },
 
