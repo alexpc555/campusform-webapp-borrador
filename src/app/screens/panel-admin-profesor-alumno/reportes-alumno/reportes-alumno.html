@@ -1,1 +1,167 @@
-<p>reportes-alumno works!</p>
+<nav class="navbar navbar-expand-lg navbar-glass sticky-top border-bottom">
+    <div class="container py-2 position-relative">
+
+        <a class="navbar-brand d-flex align-items-center gap-2">
+            <span class="brand-icon">
+                <i class="bi bi-mortarboard-fill"></i>
+            </span>
+            <span class="brand-name">CampusForum</span>
+        </a>
+
+        <div class="ms-auto d-flex align-items-center gap-2">
+
+            <button class="btn btn-outline-danger" (click)="volver()">
+                <i class="bi bi-arrow-left me-1"></i>
+                Volver
+            </button>
+
+        </div>
+
+    </div>
+</nav>
+
+
+<div class="feed-wrapper">
+
+    <div class="feed-header">
+
+        <div>
+            <h2>Mis Reportes</h2>
+            <p>Administra los reportes que has enviado a la plataforma</p>
+        </div>
+
+        <button class="btn-publicar" (click)="abrirModal()">
+            + Nuevo Reporte
+        </button>
+
+    </div>
+
+
+    <div class="posts-container">
+
+        <div class="post-card" *ngFor="let reporte of reports">
+
+            <div class="post-header">
+                <div class="avatar">
+                    <i class="bi bi-flag-fill"></i>
+                </div>
+
+                <div>
+                    <h4>{{ reporte.title }}</h4>
+                    <p>
+                        {{ reporte.type }} • {{ reporte.date }}
+                        <span class="tag ml-2 status-{{ reporte.status.toLowerCase() }}">{{ reporte.status }}</span>
+                    </p>
+                </div>
+
+            </div>
+
+            <p class="post-content mt-3">
+                <strong>Razón:</strong> {{ reporte.reason }} <br>
+                {{ reporte.description }}
+            </p>
+
+        </div>
+
+        <div *ngIf="reports.length === 0" class="text-center py-5">
+            <p>Aún no has generado ningún reporte.</p>
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- MODAL -->
+
+<div class="modal" *ngIf="modalAbierto">
+
+    <div class="modal-content">
+
+        <div class="modal-header">
+
+            <div>
+                <h2>Reportar Contenido</h2>
+                <p>Ayúdanos a mantener la comunidad segura</p>
+            </div>
+
+            <button class="close-btn" (click)="cerrarModal()">✕</button>
+
+        </div>
+
+
+        <!-- TIPO DE CONTENIDO -->
+
+        <div class="form-group">
+            <label for="tipoContenido">Tipo de contenido</label>
+            <select id="tipoContenido" [(ngModel)]="tipoContenido">
+                <option value="">Selecciona un tipo</option>
+                <option value="Publicación">Publicación</option>
+                <option value="Comentario">Comentario</option>
+                <option value="Usuario">Usuario</option>
+            </select>
+        </div>
+
+        <!-- TITULO DEL CONTENIDO -->
+
+        <div class="form-group">
+            <input type="text" placeholder="Título del contenido reportado **" maxlength="150"
+                [(ngModel)]="tituloContenido">
+            <span class="counter">
+                {{tituloContenido.length}}/150
+            </span>
+        </div>
+
+
+        <!-- RAZON -->
+
+        <div class="form-group">
+
+            <label for="razon">Razón del reporte</label>
+
+            <select id="razon" [(ngModel)]="razon">
+                <option value="">Selecciona una razón</option>
+                <option>Spam o publicidad</option>
+                <option>Contenido ofensivo</option>
+                <option>Información falsa</option>
+                <option>Acoso o intimidación</option>
+                <option>Otro</option>
+            </select>
+
+        </div>
+
+
+        <!-- DESCRIPCION -->
+
+        <div class="form-group">
+
+            <textarea placeholder="Descripción detallada de la falta **" maxlength="5000"
+                [(ngModel)]="descripcion"></textarea>
+
+            <span class="counter">
+                {{descripcion.length}}/5000
+            </span>
+
+        </div>
+
+        <p class="error" *ngIf="error">
+            {{error}}
+        </p>
+
+
+        <div class="modal-actions">
+
+            <button class="cancelar" (click)="cerrarModal()">
+                Cancelar
+            </button>
+
+            <button class="publicar" (click)="enviarReporte()">
+                Enviar Reporte
+            </button>
+
+        </div>
+
+    </div>
+
+</div>

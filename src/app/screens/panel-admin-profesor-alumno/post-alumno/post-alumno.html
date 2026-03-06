@@ -1,1 +1,160 @@
-<p>post-alumno works!</p>
+<nav class="navbar navbar-expand-lg navbar-glass sticky-top border-bottom">
+    <div class="container py-2 position-relative">
+
+        <a class="navbar-brand d-flex align-items-center gap-2">
+            <span class="brand-icon">
+                <i class="bi bi-mortarboard-fill"></i>
+            </span>
+            <span class="brand-name">CampusForum</span>
+        </a>
+
+        <div class="ms-auto d-flex align-items-center gap-2">
+
+            <button class="btn btn-outline-danger" (click)="volver()">
+                <i class="bi bi-arrow-left me-1"></i>
+                Volver
+            </button>
+
+        </div>
+
+    </div>
+</nav>
+
+
+<div class="feed-wrapper">
+
+    <div class="feed-header">
+
+        <div>
+            <h2>Feed de Publicaciones</h2>
+            <p>Administra todas tus publicaciones</p>
+        </div>
+
+        <button class="btn-publicar" (click)="abrirModal()">
+            + Nueva Publicación
+        </button>
+
+    </div>
+
+
+    <div class="posts-container">
+
+        <div class="post-card" *ngFor="let post of posts">
+
+            <div class="post-header">
+                <div class="avatar">AL</div>
+
+                <div>
+                    <h4>{{ post.title }}</h4>
+                    <p>Alumno • {{ post.date }}</p>
+                </div>
+
+            </div>
+
+            <p class="post-content">
+                {{ post.body }}
+            </p>
+
+        </div>
+
+        <div *ngIf="posts.length === 0" class="text-center py-5">
+            <p>Aún no tienes publicaciones.</p>
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- MODAL -->
+
+<div class="modal" *ngIf="modalAbierto">
+
+    <div class="modal-content">
+
+        <div class="modal-header">
+
+            <div>
+                <h2>Nueva Publicación</h2>
+                <p>Comparte tus conocimientos o haz preguntas a la comunidad</p>
+            </div>
+
+            <button class="close-btn" (click)="cerrarModal()">✕</button>
+
+        </div>
+
+
+        <!-- TITULO -->
+
+        <div class="form-group">
+
+            <input type="text" placeholder="Título **" maxlength="150" [(ngModel)]="titulo">
+
+            <span class="counter">
+                {{titulo.length}}/150
+            </span>
+
+        </div>
+
+
+        <!-- CATEGORIA -->
+
+        <div class="form-group">
+
+            <label for="categoria">Categoría</label>
+
+            <select id="categoria" [(ngModel)]="categoria">
+                <option value="">Categoría</option>
+                <option>Programación</option>
+                <option>Matemáticas</option>
+                <option>Ciencias</option>
+                <option>Idiomas</option>
+                <option>General</option>
+            </select>
+
+        </div>
+
+
+        <!-- CONTENIDO -->
+
+        <div class="form-group">
+
+            <textarea placeholder="Contenido **" maxlength="5000" [(ngModel)]="contenido"></textarea>
+
+            <span class="counter">
+                {{contenido.length}}/5000
+            </span>
+
+        </div>
+
+
+        <!-- ETIQUETAS -->
+
+        <div class="form-group">
+
+            <input type="text" placeholder="Etiquetas (opcional)" [(ngModel)]="etiquetas">
+
+        </div>
+
+
+        <p class="error" *ngIf="error">
+            {{error}}
+        </p>
+
+
+        <div class="modal-actions">
+
+            <button class="cancelar" (click)="cerrarModal()">
+                Cancelar
+            </button>
+
+            <button class="publicar" (click)="publicar()">
+                Publicar
+            </button>
+
+        </div>
+
+    </div>
+
+</div>

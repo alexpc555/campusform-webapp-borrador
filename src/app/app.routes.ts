@@ -22,6 +22,10 @@ import { ProgramacionComponent } from './screens/categorias/programacion/program
 import { GuardadosComponent } from './screens/dashboard-secciones/guardados/guardados';
 import { MisPostsComponent } from './screens/dashboard-secciones/mis-posts/mis-posts';
 import { PopularesComponent } from './screens/dashboard-secciones/populares/populares';
+import { ComentariosAlumno } from './screens/panel-admin-profesor-alumno/comentarios-alumno/comentarios-alumno';
+import { PostAlumno } from './screens/panel-admin-profesor-alumno/post-alumno/post-alumno';
+import { ReportesAlumno } from './screens/panel-admin-profesor-alumno/reportes-alumno/reportes-alumno';
+
 
 export const routes: Routes = [
 
@@ -53,6 +57,9 @@ export const routes: Routes = [
   { path: 'admin', component: AdminScreen },
 
   { path: 'student-panel', component: StudentPanelComponent },
+  { path: 'student-panel/post', component: PostAlumno },
+  { path: 'student-panel/comentarios', component: ComentariosAlumno },
+  { path: 'student-panel/reportes', component: ReportesAlumno },
 
   { path: 'admin/usuarios', component: GestionUsuario },
   { path: 'admin/categorias', component: CategoriasAdministracion },
