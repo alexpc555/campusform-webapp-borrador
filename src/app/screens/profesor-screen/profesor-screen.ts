@@ -25,8 +25,10 @@ export class ProfesorScreen {
     this.router.navigate(['/profesor/reportes']);
   }
 
-  salir(){
-    this.router.navigate(['/']);
-  }
+ salir() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('rol');
+  this.router.navigate(['/login']);
+}
 
 }
