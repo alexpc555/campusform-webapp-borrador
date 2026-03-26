@@ -65,6 +65,25 @@
   }
 }
 
+/* Alertas */
+.alert {
+  padding: 12px 16px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  
+  i {
+    font-size: 1.2rem;
+  }
+}
+
+.alert-danger {
+  background-color: #fee2e2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+}
+
 /* layout */
 .form{ display: grid; gap: 16px; }
 .full{ width: 100%; }
@@ -74,7 +93,7 @@
   align-items: center;
   justify-content: space-between;
   margin-top: 6px;
-  margin-bottom: -8px; /* para que quede como tu diseño */
+  margin-bottom: -8px;
 }
 
 .label{
@@ -138,7 +157,7 @@
   }
 }
 
-/* Botón (azul sólido como Figma) */
+/* Botón */
 .login-btn{
   width: 100%;
   height: 46px;
@@ -148,7 +167,17 @@
   font-weight: 800;
   letter-spacing: 0.2px;
   margin-top: 6px;
+  
+  &:hover {
+    background: #0b3a73 !important;
+  }
+  
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
 }
+
 :host ::ng-deep .login-btn .mdc-button__label{ color: #fff !important; }
 
 /* footer */
@@ -175,3 +204,29 @@
   font-weight: 700;
 }
 .back:hover{ text-decoration: underline; }
+
+/* Test links */
+.test-links {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  
+  p {
+    font-size: 0.9rem;
+    color: #64748b;
+  }
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+  .card {
+    padding: 24px 20px;
+  }
+  
+  .brand__name {
+    font-size: 28px;
+  }
+  
+  .card__head h1 {
+    font-size: 28px;
+  }
+}

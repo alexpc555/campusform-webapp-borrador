@@ -14,6 +14,12 @@
         <p>Accede con tu correo institucional</p>
       </div>
 
+      <!-- Mensaje de error general -->
+      <div class="alert alert-danger" *ngIf="errorMessage" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        {{ errorMessage }}
+      </div>
+
       <form [formGroup]="form" (ngSubmit)="submit()" class="form">
 
         <!-- Email -->
@@ -37,7 +43,6 @@
           </mat-error>
         </mat-form-field>
 
-
         <!-- Password input -->
         <mat-form-field appearance="fill" floatLabel="always" class="full">
           <mat-label>Contraseña</mat-label>
@@ -45,10 +50,13 @@
 
           <input
             matInput
-            type="password"
+            [type]="hidePassword ? 'password' : 'text'"
             placeholder="••••••••"
             formControlName="password"
           />
+          <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword">
+            <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
 
           <mat-error *ngIf="password?.touched && password?.hasError('required')">
             La contraseña es requerida
@@ -67,37 +75,40 @@
           type="submit"
           [disabled]="submitting"
         >
-          {{ submitting ? 'Ingresando…' : 'Iniciar Sesión' }}
+          <span *ngIf="!submitting">
+            <i class="bi bi-box-arrow-in-right me-2"></i>
+            Iniciar Sesión
+          </span>
+          <span *ngIf="submitting">
+            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+            Ingresando...
+          </span>
         </button>
       </form>
 
       <div class="footer">
         <span>¿No tienes cuenta?</span>
-        <!-- agregar despues -->
         <a routerLink="/register" class="link link--strong">Regístrate aquí</a>
+      </div>
+      
+      <div class="mt-3 text-center">
+        <button class="link" (click)="forgotPassword()">¿Olvidaste tu contraseña?</button>
       </div>
     </div>
 
     <a routerLink="/" class="back">← Volver al inicio</a>
 
-
-    <p>pruebas de funcionamiento no borrar</p>
-    <p>entrar a la siguiente vista</p>
-    <a routerLink="/profesor" class="back">← vista profesor</a>
-
-
-    <p>entrar a la siguiente vista </p>
-    <a routerLink="/admin" class="back">← vista admin</a>
-
-       <p>entrar a la siguiente vista analytics</p>
-    <a routerLink="/analytics-page" class="back">← vista analiticas</a>
-
-       <p>entrar a la siguiente vista dashboard</p>
-    <a routerLink="/dashboard" class="back">← vista dashboard</a>
-
-     <p>entrar a la siguiente vista alumno</p>
-    <a routerLink="/student-panel" class="back">← vista alumno</a>
-
+    <!-- Enlaces de prueba (mantener para desarrollo) -->
+    <div class="test-links mt-4 p-3 bg-light rounded">
+      <p class="fw-bold mb-2">🔧 Enlaces de prueba:</p>
+      <div class="d-flex flex-wrap gap-2">
+        <a routerLink="/profesor" class="btn btn-sm btn-outline-secondary">Vista Profesor</a>
+        <a routerLink="/admin" class="btn btn-sm btn-outline-secondary">Vista Admin</a>
+        <a routerLink="/analytics-page" class="btn btn-sm btn-outline-secondary">Analytics</a>
+        <a routerLink="/dashboard" class="btn btn-sm btn-outline-secondary">Dashboard</a>
+        <a routerLink="/student-panel" class="btn btn-sm btn-outline-secondary">Vista Alumno</a>
+      </div>
+    </div>
 
   </div>
 </div>
