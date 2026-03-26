@@ -33,7 +33,7 @@ export interface AuthResponse {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:8000/api'; // Ajusta según tu configuración
+  private apiUrl = 'http://localhost:8000/api';
 
   constructor(
     private http: HttpClient,
@@ -53,25 +53,19 @@ export class AuthService {
           localStorage.setItem('refresh', response.refresh);
           localStorage.setItem('user', JSON.stringify(response.user));
           
-          // Mostrar información de depuración
-          console.log('Usuario autenticado:', response.user);
-          console.log('Rol:', response.user.role);
-          console.log('Redirigiendo a:', response.redirect);
+          console.log('✅ Usuario autenticado:', response.user);
+          console.log('📌 Rol:', response.user.role);
           
-          // Redirigir según el rol usando la URL que viene del backend
-          if (response.redirect) {
-            this.router.navigate([response.redirect]);
-          } else {
-            // Fallback por si el backend no envía redirect
-            const redirectMap = {
-              'student': '/dashboard',
-              'teacher': '/profesor',
-              'admin': '/admin'
-            };
-            const redirectPath = redirectMap[response.user.role];
-            console.log('Usando fallback redirect:', redirectPath);
-            this.router.navigate([redirectPath]);
-          }
+          // Redirigir según el rol
+          const redirectMap: { [key: string]: string } = {
+            'student': '/student-panel',   // Cambiado de '/dashboard' a '/student-panel'
+            'teacher': '/profesor',
+            'admin': '/admin'
+          };
+          
+          const redirectPath = redirectMap[response.user.role];
+          console.log('🔄 Redirigiendo a:', redirectPath);
+          this.router.navigate([redirectPath]);
         }
       })
     );
@@ -102,13 +96,11 @@ export class AuthService {
     return user ? user.role : null;
   }
 
-  // Método para verificar si el usuario tiene un rol específico
   hasRole(role: 'student' | 'teacher' | 'admin'): boolean {
     const userRole = this.getRole();
     return userRole === role;
   }
 
-  // Método para refrescar el token (útil cuando expira)
   refreshToken(): Observable<any> {
     const refresh = localStorage.getItem('refresh');
     return this.http.post(`${this.apiUrl}/auth/refresh/`, { refresh }).pipe(

@@ -1,8 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
-import { Publication } from '../../student-panel/student-panel';
+import { PostService, Post, CreatePostPayload } from '../../../services/post.services';
+import { CategoryService, Category } from '../../../services/category.services';
+import { AuthService } from '../../../services/auth.services';
 
 @Component({
   selector: 'app-post-alumno',
@@ -11,36 +13,125 @@ import { Publication } from '../../student-panel/student-panel';
   templateUrl: './post-alumno.html',
   styleUrls: ['./post-alumno.scss'],
 })
-export class PostAlumno {
-
-  constructor(private router: Router) { }
-
+export class PostAlumno implements OnInit {
   modalAbierto = false;
+  editando = false;
+  editandoId: number | null = null;
 
   titulo = '';
-  categoria = '';
+  categoriaId: number | null = null;
   contenido = '';
   etiquetas = '';
 
   error = '';
+  loading = false;
+  cargandoPosts = false;
 
-  posts: Publication[] = [];
+  posts: Post[] = [];
+  categorias: Category[] = [];
+
+  usuarioActual: any;
+
+  constructor(
+    private router: Router,
+    private postService: PostService,
+    private categoryService: CategoryService,
+    private authService: AuthService
+  ) {}
+
+  ngOnInit() {
+    this.usuarioActual = this.authService.getCurrentUser();
+    this.cargarCategorias();
+    this.cargarMisPosts();
+  }
+
+  cargarCategorias() {
+    this.categoryService.getCategories().subscribe({
+      next: (data) => {
+        this.categorias = data;
+      },
+      error: (err) => {
+        console.error('Error cargando categorías:', err);
+      }
+    });
+  }
+
+  cargarMisPosts() {
+    this.cargandoPosts = true;
+    this.postService.getMyPosts().subscribe({
+      next: (data) => {
+        this.posts = data;
+        this.cargandoPosts = false;
+      },
+      error: (err) => {
+        console.error('Error cargando posts:', err);
+        this.cargandoPosts = false;
+      }
+    });
+  }
+
+  getNombreCategoria(categoriaId: number): string {
+    const categoria = this.categorias.find(c => c.id === categoriaId);
+    return categoria ? categoria.nombre : 'Sin categoría';
+  }
+
+  getInitials(nombre: string): string {
+    if (!nombre) return '??';
+    const words = nombre.split(' ');
+    if (words.length >= 2) {
+      return (words[0][0] + words[1][0]).toUpperCase();
+    }
+    return nombre.substring(0, 2).toUpperCase();
+  }
 
   abrirModal() {
+    this.editando = false;
+    this.editandoId = null;
+    this.titulo = '';
+    this.categoriaId = null;
+    this.contenido = '';
+    this.etiquetas = '';
+    this.error = '';
     this.modalAbierto = true;
+  }
+
+  editarPost(post: Post) {
+    this.editando = true;
+    this.editandoId = post.id;
+    this.titulo = post.titulo;
+    this.categoriaId = post.categoria;
+    this.contenido = post.contenido;
+    this.etiquetas = post.etiquetas || '';
+    this.error = '';
+    this.modalAbierto = true;
+  }
+
+  eliminarPost(post: Post) {
+    if (!confirm(`¿Eliminar la publicación "${post.titulo}"? Esta acción no se puede deshacer.`)) {
+      return;
+    }
+
+    this.postService.deletePost(post.id).subscribe({
+      next: () => {
+        this.posts = this.posts.filter(p => p.id !== post.id);
+        alert('✅ Publicación eliminada correctamente');
+      },
+      error: (err) => {
+        console.error('Error eliminando post:', err);
+        alert('❌ Error al eliminar la publicación');
+      }
+    });
   }
 
   cerrarModal() {
     this.modalAbierto = false;
+    this.editando = false;
+    this.editandoId = null;
     this.error = '';
   }
 
-  volver() {
-    this.router.navigate(['/student-panel']);
-  }
-
   publicar() {
-
+    // Validaciones
     if (!this.titulo.trim()) {
       this.error = "El título es obligatorio";
       return;
@@ -51,7 +142,7 @@ export class PostAlumno {
       return;
     }
 
-    if (!this.categoria) {
+    if (!this.categoriaId) {
       this.error = "Debe seleccionar una categoría";
       return;
     }
@@ -67,26 +158,49 @@ export class PostAlumno {
     }
 
     this.error = '';
+    this.loading = true;
 
-    const now = new Date();
-    const post: Publication = {
-      id: this.posts.length + 1,
-      title: this.titulo,
-      body: this.contenido,
-      date: now.toISOString().split('T')[0]
+    const payload: CreatePostPayload = {
+      titulo: this.titulo.trim(),
+      contenido: this.contenido.trim(),
+      categoria: this.categoriaId,
+      etiquetas: this.etiquetas.trim() || null
     };
 
-    this.posts.unshift(post);
-
-    alert("Publicación creada correctamente");
-
-    this.titulo = '';
-    this.categoria = '';
-    this.contenido = '';
-    this.etiquetas = '';
-
-    this.modalAbierto = false;
-
+    if (this.editando && this.editandoId) {
+      // Actualizar post existente
+      this.postService.updatePost(this.editandoId, payload).subscribe({
+        next: (postActualizado) => {
+          this.posts = this.posts.map(p => p.id === postActualizado.id ? postActualizado : p);
+          this.loading = false;
+          this.cerrarModal();
+          alert('✅ Publicación actualizada correctamente');
+        },
+        error: (err) => {
+          console.error('Error actualizando post:', err);
+          this.error = err.error?.message || 'Error al actualizar la publicación';
+          this.loading = false;
+        }
+      });
+    } else {
+      // Crear nuevo post
+      this.postService.createPost(payload).subscribe({
+        next: (nuevoPost) => {
+          this.posts = [nuevoPost, ...this.posts];
+          this.loading = false;
+          this.cerrarModal();
+          alert('✅ Publicación creada correctamente');
+        },
+        error: (err) => {
+          console.error('Error creando post:', err);
+          this.error = err.error?.message || 'Error al crear la publicación';
+          this.loading = false;
+        }
+      });
+    }
   }
 
+  volver() {
+    this.router.navigate(['/student-panel']);
+  }
 }
