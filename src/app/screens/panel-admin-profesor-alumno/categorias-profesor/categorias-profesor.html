@@ -1,58 +1,170 @@
-<nav class="navbar navbar-expand-lg navbar-glass sticky-top border-bottom">
-  <div class="container py-2 position-relative">
+<div class="landing-root">
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-glass sticky-top border-bottom">
+    <div class="container py-2 position-relative">
+      <a class="navbar-brand d-flex align-items-center gap-2" routerLink="/profesor">
+        <span class="brand-icon"><i class="bi bi-mortarboard-fill"></i></span>
+        <span class="brand-name">CampusForum</span>
+      </a>
 
-    <a class="navbar-brand d-flex align-items-center gap-2">
-      <span class="brand-icon">
-        <i class="bi bi-mortarboard-fill"></i>
-      </span>
-      <span class="brand-name">CampusForum</span>
-    </a>
+      <div class="ms-auto d-flex align-items-center gap-2">
+        <span class="badge badge-soft d-none d-md-inline">Profesor • Categorías</span>
+        <a class="btn btn-outline-primary" routerLink="/profesor">Volver</a>
+      </div>
+    </div>
+  </nav>
 
-    <div class="ms-auto d-flex align-items-center gap-2">
+  <section class="container py-5">
+    <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 mb-4">
+      <div>
+        <h1 class="section-title mb-2">Administración de Categorías</h1>
+        <p class="section-subtitle mb-0">Crea, edita y elimina categorías del foro</p>
+      </div>
 
-      <button class="btn btn-outline-danger" (click)="volver()">
-        <i class="bi bi-arrow-left me-1"></i>
-        Volver
+      <div class="d-flex gap-2 align-items-center">
+        <input class="form-control form-control-sm search-input"
+               placeholder="Buscar categoría..."
+               [(ngModel)]="search" />
+      </div>
+    </div>
+
+    <!-- Mensaje de error -->
+    <div class="alert alert-danger" *ngIf="errorMessage">
+      {{ errorMessage }}
+      <button class="btn btn-sm btn-outline-danger ms-3" (click)="loadCategories()">
+        Reintentar
       </button>
-
     </div>
 
-  </div>
-</nav>
+    <!-- Crear categoría -->
+    <div class="glass-card p-4 mb-4">
+      <h2 class="feature-title mb-3">Nueva categoría</h2>
 
+      <div class="row g-2 align-items-end">
+        <div class="col-md-5">
+          <label class="form-label small text-muted">Nombre</label>
+          <input class="form-control" 
+                 [(ngModel)]="newCategory.nombre" 
+                 placeholder="Ej: Química"
+                 [disabled]="loading" />
+        </div>
 
-<div class="categorias-wrapper">
+        <div class="col-md-5">
+          <label class="form-label small text-muted">Descripción</label>
+          <input class="form-control" 
+                 [(ngModel)]="newCategory.descripcion" 
+                 placeholder="Ej: Orgánica, inorgánica..."
+                 [disabled]="loading" />
+        </div>
 
-  <div class="header">
-
-    <h2>Categorías</h2>
-    <p>Selecciona una categoría para ver publicaciones</p>
-
-  </div>
-
-
-  <div class="categorias-grid">
-
-    <div class="categoria-card" (click)="irFisica()">
-      <span class="icon">📘</span>
-      <h3>Física</h3>
+        <div class="col-md-2 d-grid">
+          <button class="btn btn-primary" 
+                  (click)="createCategory()"
+                  [disabled]="loading">
+            <span *ngIf="!loading"><i class="bi bi-plus-lg me-2"></i> Crear</span>
+            <span *ngIf="loading">
+              <span class="spinner-border spinner-border-sm me-2"></span>
+              Creando...
+            </span>
+          </button>
+        </div>
+      </div>
     </div>
 
-    <div class="categoria-card" (click)="irIngles()">
-      <span class="icon">🇬🇧</span>
-      <h3>Inglés</h3>
+    <!-- Tabla -->
+    <div class="glass-card p-3 p-md-4">
+      <!-- Spinner de carga -->
+      <div class="text-center py-5" *ngIf="loading && categories.length === 0">
+        <div class="spinner-border text-primary mb-3" role="status">
+          <span class="visually-hidden">Cargando...</span>
+        </div>
+        <p class="text-muted">Cargando categorías...</p>
+      </div>
+
+      <!-- Tabla (solo si no está cargando o ya hay datos) -->
+      <div class="table-responsive" *ngIf="!loading || categories.length > 0">
+        <table class="table table-wire align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Categoría</th>
+              <th>Descripción</th>
+              <th class="text-center">Posts</th>
+              <th class="text-end">Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let c of filteredCategories">
+              <td>
+                <ng-container *ngIf="editingId !== c.id; else editName">
+                  <span class="fw-bold">{{ c.nombre }}</span>
+                </ng-container>
+
+                <ng-template #editName>
+                  <input class="form-control form-control-sm edit-input"
+                         [(ngModel)]="editForm.nombre"
+                         [disabled]="loading" />
+                </ng-template>
+              </td>
+
+              <td>
+                <ng-container *ngIf="editingId !== c.id; else editDesc">
+                  <span class="text-muted">{{ c.descripcion }}</span>
+                </ng-container>
+
+                <ng-template #editDesc>
+                  <input class="form-control form-control-sm edit-input"
+                         [(ngModel)]="editForm.descripcion"
+                         [disabled]="loading" />
+                </ng-template>
+              </td>
+
+              <td class="text-center">
+                <span class="badge badge-soft">{{ c.post_count }}</span>
+              </td>
+
+              <td class="text-end">
+                <ng-container *ngIf="editingId !== c.id; else editActions">
+                  <button class="btn btn-link text-decoration-none me-2" 
+                          (click)="startEdit(c)" 
+                          title="Editar"
+                          [disabled]="loading">
+                    <i class="bi bi-pencil-square"></i>
+                  </button>
+                  <button class="btn btn-link text-decoration-none text-danger" 
+                          (click)="deleteCategory(c)" 
+                          title="Eliminar"
+                          [disabled]="loading">
+                    <i class="bi bi-trash3"></i>
+                  </button>
+                </ng-container>
+
+                <ng-template #editActions>
+                  <button class="btn btn-outline-success btn-sm me-2" 
+                          (click)="saveEdit(c)"
+                          [disabled]="loading">
+                    <span *ngIf="!loading"><i class="bi bi-check2"></i> Guardar</span>
+                    <span *ngIf="loading" class="spinner-border spinner-border-sm"></span>
+                  </button>
+
+                  <button class="btn btn-outline-secondary btn-sm" 
+                          (click)="cancelEdit()"
+                          [disabled]="loading">
+                    Cancelar
+                  </button>
+                </ng-template>
+              </td>
+            </tr>
+
+            <tr *ngIf="filteredCategories.length === 0 && !loading">
+              <td colspan="4" class="text-center text-muted py-4">
+                No hay categorías con ese filtro.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
-    <div class="categoria-card" (click)="irMatematicas()">
-      <span class="icon">➗</span>
-      <h3>Matemáticas</h3>
-    </div>
-
-    <div class="categoria-card" (click)="irProgramacion()">
-      <span class="icon">💻</span>
-      <h3>Programación</h3>
-    </div>
-
-  </div>
-
+  </section>
 </div>

@@ -2,17 +2,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 
-//Elementos de angular material
-import {MatButtonModule} from '@angular/material/button';
-import {MatDividerModule} from '@angular/material/divider';
-import {MatIconModule} from '@angular/material/icon';
-import {MatRadioButton } from '@angular/material/radio';
-import { MatRadioModule } from '@angular/material/radio';
+// Elementos de angular material
+import { MatButtonModule } from '@angular/material/button';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatIconModule } from '@angular/material/icon';
+import { MatRadioModule } from '@angular/material/radio'; // Importa el módulo completo
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatSidenavModule } from '@angular/material/sidenav'; // si usas mat-sidenav-container
-
-
-/* Formularios */
+import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -23,6 +19,11 @@ import { ReactiveFormsModule } from '@angular/forms';
    ngx-mask (inputs de código)
    ========================= */
 import { NgxMaskDirective, NgxMaskPipe } from 'ngx-mask';
+
+/* =========================
+   Bootstrap JS (para modales)
+   ========================= */
+import * as bootstrap from 'bootstrap';
 
 /**
  * SHARED_IMPORTS
@@ -38,6 +39,7 @@ export const SHARED_IMPORTS = [
   FormsModule,
   RouterModule,
 
+  // Angular Material
   MatButtonModule,
   MatDividerModule,
   MatIconModule,
@@ -45,13 +47,15 @@ export const SHARED_IMPORTS = [
   MatFormFieldModule,
   MatSelectModule,
   MatCheckboxModule,
-  MatRadioButton,
+  MatRadioModule, // Usa el módulo completo
   ReactiveFormsModule,
-  MatRadioModule,
   MatToolbarModule,
   MatSidenavModule,
 
-  /* Third-party */
+  // Third-party
   NgxMaskDirective,
   NgxMaskPipe,
-]as const;
+] as const;
+
+// Exporta bootstrap para que esté disponible en los componentes
+export { bootstrap };

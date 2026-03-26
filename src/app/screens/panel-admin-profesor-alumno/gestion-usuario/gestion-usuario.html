@@ -8,7 +8,7 @@
       </a>
 
       <div class="ms-auto d-flex align-items-center gap-2">
-        <span class="badge badge-soft d-none d-md-inline">Admin • Usuarios</span>
+        <span class="badge badge-soft d-none d-md-inline">Admin • Gestión de Usuarios</span>
         <a class="btn btn-outline-primary" routerLink="/admin">Volver</a>
       </div>
     </div>
@@ -18,7 +18,7 @@
     <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 mb-4">
       <div>
         <h1 class="section-title mb-2">Gestión de Usuarios</h1>
-        <p class="section-subtitle mb-0">Busca, filtra, cambia roles y modera cuentas</p>
+        <p class="section-subtitle mb-0">Visualiza, crea, edita y gestiona todos los usuarios del sistema</p>
       </div>
 
       <div class="d-flex flex-wrap gap-2 align-items-center">
@@ -31,110 +31,73 @@
         <select class="form-select form-select-sm w-auto" [(ngModel)]="roleFilter">
           <option value="all">Todos los roles</option>
           <option value="student">Estudiante</option>
-          <option value="professor">Profesor</option>
-          <option value="admin">Admin</option>
+          <option value="teacher">Profesor</option>
+          <option value="admin">Administrador</option>
         </select>
 
-        <select class="form-select form-select-sm w-auto" [(ngModel)]="statusFilter">
-          <option value="all">Todos</option>
-          <option value="active">Activos</option>
-          <option value="suspended">Suspendidos</option>
-        </select>
+        <button class="btn btn-primary btn-sm" (click)="openCreateModal()">
+          <i class="bi bi-plus-lg me-2"></i> Nuevo Usuario
+        </button>
       </div>
     </div>
 
-    <!-- Crear usuario -->
-    <div class="glass-card p-4 mb-4">
-      <h2 class="feature-title mb-3">Crear usuario (demo)</h2>
+    <!-- Mensaje de error -->
+    <div class="alert alert-danger" *ngIf="errorMessage">
+      {{ errorMessage }}
+      <button class="btn btn-sm btn-outline-danger ms-3" (click)="loadUsers()">
+        Reintentar
+      </button>
+    </div>
 
-      <div class="row g-2 align-items-end">
-        <div class="col-md-4">
-          <label class="form-label small text-muted">Nombre</label>
-          <input class="form-control" [(ngModel)]="newUser.name" placeholder="Ej: Ana López" />
-        </div>
-
-        <div class="col-md-4">
-          <label class="form-label small text-muted">Email</label>
-          <input class="form-control" [(ngModel)]="newUser.email" placeholder="ej: ana@buap.mx" />
-        </div>
-
-        <div class="col-md-2">
-          <label class="form-label small text-muted">Rol</label>
-          <select class="form-select" [(ngModel)]="newUser.role">
-            <option value="student">Estudiante</option>
-            <option value="professor">Profesor</option>
-            <option value="admin">Admin</option>
-          </select>
-        </div>
-
-        <div class="col-md-2 d-grid">
-          <button class="btn btn-primary" (click)="createUser()">
-            <i class="bi bi-plus-lg me-2"></i> Crear
-          </button>
-        </div>
+    <!-- Spinner de carga -->
+    <div class="text-center py-5" *ngIf="loading && users.length === 0">
+      <div class="spinner-border text-primary mb-3" role="status">
+        <span class="visually-hidden">Cargando...</span>
       </div>
-
-      <div class="text-muted small mt-2">
-        *Esto es demo. Luego lo conectas a tu backend/BD.
-      </div>
+      <p class="text-muted">Cargando usuarios...</p>
     </div>
 
     <!-- Tabla usuarios -->
-    <div class="glass-card p-3 p-md-4">
+    <div class="glass-card p-3 p-md-4" *ngIf="!loading || users.length > 0">
       <div class="table-responsive">
         <table class="table table-wire align-middle mb-0">
           <thead>
-            <tr>
+             <tr>
               <th>Usuario</th>
               <th>Email</th>
               <th>Rol</th>
-              <th>Estatus</th>
-              <th>Alta</th>
               <th class="text-end">Acciones</th>
-            </tr>
+             </tr>
           </thead>
 
           <tbody>
             <tr *ngFor="let u of filteredUsers">
-              <td class="fw-bold">{{ u.name }}</td>
-              <td class="text-muted">{{ u.email }}</td>
-
+              <td class="fw-bold">{{ u.nombre }}</td>
+              <td class="text-muted">{{ u.correo }}</td>
               <td>
-                <select
-                  class="form-select form-select-sm w-auto"
-                  [value]="u.role"
-                  (change)="setRole(u, $any($event.target).value)"
-                >
-                  <option value="student">Estudiante</option>
-                  <option value="professor">Profesor</option>
-                  <option value="admin">Admin</option>
-                </select>
-              </td>
-
-              <td>
-                <span class="status-pill" [class]="statusClass(u.status)">
-                  <i class="bi" [class.bi-check-circle]="u.status==='active'" [class.bi-slash-circle]="u.status==='suspended'"></i>
-                  <span class="ms-1">{{ u.status === 'active' ? 'Activo' : 'Suspendido' }}</span>
+                <span class="badge" [ngClass]="getRoleBadgeClass(u.rol)">
+                  <i class="bi" [ngClass]="getRoleIcon(u.rol)"></i>
+                  <span class="ms-1">{{ getRoleName(u.rol) }}</span>
                 </span>
               </td>
-
-              <td class="text-muted">{{ u.createdAt }}</td>
-
               <td class="text-end">
-                <button class="btn btn-outline-secondary btn-sm me-2" (click)="toggleSuspend(u)">
-                  <i class="bi" [class.bi-ban]="u.status==='active'" [class.bi-unlock]="u.status==='suspended'"></i>
-                  <span class="ms-1">{{ u.status==='active' ? 'Suspender' : 'Reactivar' }}</span>
+                <button class="btn btn-link text-decoration-none me-2" 
+                        (click)="editUser(u)" 
+                        title="Editar"
+                        [disabled]="loading">
+                  <i class="bi bi-pencil-square"></i>
                 </button>
-
-                <button class="btn btn-outline-danger btn-sm" (click)="deleteUser(u)">
+                <button class="btn btn-link text-decoration-none text-danger" 
+                        (click)="deleteUser(u)" 
+                        title="Eliminar"
+                        [disabled]="loading">
                   <i class="bi bi-trash3"></i>
-                  <span class="ms-1">Eliminar</span>
                 </button>
               </td>
             </tr>
 
-            <tr *ngIf="filteredUsers.length === 0">
-              <td colspan="6" class="text-center text-muted py-4">
+            <tr *ngIf="filteredUsers.length === 0 && !loading">
+              <td colspan="4" class="text-center text-muted py-4">
                 No hay usuarios con esos filtros.
               </td>
             </tr>
@@ -144,4 +107,126 @@
     </div>
 
   </section>
+</div>
+
+<!-- Modal para crear/editar usuario con validaciones -->
+<div class="modal fade" id="userModal" tabindex="-1" data-bs-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content glass-card">
+      <div class="modal-header border-0">
+        <h5 class="modal-title feature-title">{{ modalTitle }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form #userForm="ngForm">
+          <!-- Nombre -->
+          <div class="mb-3">
+            <label class="form-label small text-muted">Nombre Completo *</label>
+            <input class="form-control" 
+                   [(ngModel)]="formUser.nombre" 
+                   name="nombre"
+                   required
+                   pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+"
+                   #nombre="ngModel"
+                   placeholder="Ej: Juan Pérez">
+            <div class="text-danger small mt-1" *ngIf="nombre.touched && nombre.invalid">
+              <span *ngIf="nombre.errors?.['required']">El nombre es requerido</span>
+              <span *ngIf="nombre.errors?.['pattern']">Solo se permiten letras y espacios</span>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="mb-3">
+            <label class="form-label small text-muted">Correo Electrónico *</label>
+            <input class="form-control" 
+                   type="email"
+                   [(ngModel)]="formUser.correo" 
+                   name="correo"
+                   required
+                   email
+                   #correo="ngModel"
+                   [placeholder]="getEmailPlaceholder()">
+            <div class="text-danger small mt-1" *ngIf="correo.touched && correo.invalid">
+              <span *ngIf="correo.errors?.['required']">El correo es requerido</span>
+              <span *ngIf="correo.errors?.['email']">Ingrese un correo válido</span>
+              <span *ngIf="correo.errors?.['invalidEmailForRole']">{{ getEmailErrorMessage() }}</span>
+            </div>
+          </div>
+
+          <!-- Rol -->
+          <div class="mb-3">
+            <label class="form-label small text-muted">Rol *</label>
+            <select class="form-select" [(ngModel)]="formUser.rol" name="rol" required (change)="onRoleChange()">
+              <option value="student">Estudiante</option>
+              <option value="teacher">Profesor</option>
+              <option value="admin">Administrador</option>
+            </select>
+          </div>
+
+          <!-- Contraseña (solo para creación) -->
+          <div class="mb-3" *ngIf="!editingUser">
+            <label class="form-label small text-muted">Contraseña *</label>
+            <input class="form-control" 
+                   type="password"
+                   [(ngModel)]="formUser.contrasena" 
+                   name="contrasena"
+                   required
+                   minlength="8"
+                   pattern="^(?=.*[A-Z])(?=.*\d).{8,}$"
+                   #contrasena="ngModel"
+                   placeholder="Mínimo 8 caracteres, una mayúscula y un número">
+            <div class="text-danger small mt-1" *ngIf="contrasena.touched && contrasena.invalid">
+              <span *ngIf="contrasena.errors?.['required']">La contraseña es requerida</span>
+              <span *ngIf="contrasena.errors?.['minlength']">Mínimo 8 caracteres</span>
+              <span *ngIf="contrasena.errors?.['pattern']">Debe tener al menos una mayúscula y un número</span>
+            </div>
+          </div>
+
+          <!-- Confirmar Contraseña (solo para creación) -->
+          <div class="mb-3" *ngIf="!editingUser">
+            <label class="form-label small text-muted">Confirmar Contraseña *</label>
+            <input class="form-control" 
+                   type="password"
+                   [(ngModel)]="formUser.confirmPassword" 
+                   name="confirmPassword"
+                   required
+                   #confirmPassword="ngModel">
+            <div class="text-danger small mt-1" *ngIf="confirmPassword.touched && confirmPassword.invalid">
+              <span *ngIf="confirmPassword.errors?.['required']">Confirma tu contraseña</span>
+              <span *ngIf="passwordsMismatch">Las contraseñas no coinciden</span>
+            </div>
+          </div>
+
+          <!-- Nueva Contraseña (para edición) -->
+          <div class="mb-3" *ngIf="editingUser">
+            <label class="form-label small text-muted">Nueva Contraseña (opcional)</label>
+            <input class="form-control" 
+                   type="password"
+                   [(ngModel)]="formUser.contrasena" 
+                   name="contrasena"
+                   minlength="8"
+                   pattern="^(?=.*[A-Z])(?=.*\d).{8,}$"
+                   #nuevaContrasena="ngModel"
+                   placeholder="Dejar en blanco para mantener la actual">
+            <div class="text-danger small mt-1" *ngIf="nuevaContrasena.touched && nuevaContrasena.invalid">
+              <span *ngIf="nuevaContrasena.errors?.['minlength']">Mínimo 8 caracteres</span>
+              <span *ngIf="nuevaContrasena.errors?.['pattern']">Debe tener al menos una mayúscula y un número</span>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer border-0">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary" 
+                (click)="saveUser()"
+                [disabled]="saving || userForm.invalid || passwordsMismatch">
+          <span *ngIf="!saving"><i class="bi bi-check-lg me-2"></i> Guardar</span>
+          <span *ngIf="saving">
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Guardando...
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
