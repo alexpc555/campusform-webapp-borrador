@@ -14,18 +14,9 @@ import { CategoriasProfesor } from './screens/panel-admin-profesor-alumno/catego
 import { PostProfesor } from './screens/panel-admin-profesor-alumno/post-profesor/post-profesor';
 import { ReportesProfesor } from './screens/panel-admin-profesor-alumno/reportes-profesor/reportes-profesor';
 import { ReportesAdmin } from './screens/panel-admin-profesor-alumno/reportes-admin/reportes-admin';
-import { CategoriasScreen } from './screens/categorias/categorias-screen/categorias-screen';
-import { FisicaComponent } from './screens/categorias/fisica/fisica';
-import { InglesComponent } from './screens/categorias/ingles/ingles';
-import { MatematicasComponent } from './screens/categorias/matematicas/matematicas';
-import { ProgramacionComponent } from './screens/categorias/programacion/programacion';
-import { GuardadosComponent } from './screens/dashboard-secciones/guardados/guardados';
-import { MisPostsComponent } from './screens/dashboard-secciones/mis-posts/mis-posts';
-import { PopularesComponent } from './screens/dashboard-secciones/populares/populares';
 import { ComentariosAlumno } from './screens/panel-admin-profesor-alumno/comentarios-alumno/comentarios-alumno';
 import { PostAlumno } from './screens/panel-admin-profesor-alumno/post-alumno/post-alumno';
 import { ReportesAlumno } from './screens/panel-admin-profesor-alumno/reportes-alumno/reportes-alumno';
-
 
 export const routes: Routes = [
 
@@ -35,35 +26,31 @@ export const routes: Routes = [
 
   { path: 'register', component: Registro },
 
+  // Rutas de Profesor
   { path: 'profesor', component: ProfesorScreen },
   { path: 'profesor/post', component: PostProfesor },
   { path: 'profesor/categorias', component: CategoriasProfesor },
   { path: 'profesor/reportes', component: ReportesProfesor },
 
+  // Analytics
   { path: 'analytics-page', component: AnalyticsPageComponent },
 
+  // Dashboard principal (con todo integrado)
   { path: 'dashboard', component: DashboardScreen, pathMatch: 'full' },
-  { path: 'dashboard/categoria/fisica', component: FisicaComponent },
-  { path: 'dashboard/categoria/ingles', component: InglesComponent },
-  { path: 'dashboard/categoria/matematicas', component: MatematicasComponent },
-  { path: 'dashboard/categoria/programacion', component: ProgramacionComponent },
 
-  { path: 'dashboard/mis-posts', component: MisPostsComponent },
-  { path: 'dashboard/populares', component: PopularesComponent },
-  { path: 'dashboard/guardados', component: GuardadosComponent },
-
-
-
+  // Rutas de Admin
   { path: 'admin', component: AdminScreen },
+  { path: 'admin/usuarios', component: GestionUsuario },
+  { path: 'admin/categorias', component: CategoriasAdministracion },
+  { path: 'admin/reportes', component: ReportesAdmin },
 
+  // Rutas de Estudiante
   { path: 'student-panel', component: StudentPanelComponent },
   { path: 'student-panel/post', component: PostAlumno },
   { path: 'student-panel/comentarios', component: ComentariosAlumno },
   { path: 'student-panel/reportes', component: ReportesAlumno },
 
-  { path: 'admin/usuarios', component: GestionUsuario },
-  { path: 'admin/categorias', component: CategoriasAdministracion },
-  { path: 'admin/reportes', component: ReportesAdmin },
+  // Redirección por defecto
   { path: '**', redirectTo: '' }
 
 ];

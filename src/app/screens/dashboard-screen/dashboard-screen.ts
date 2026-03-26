@@ -90,39 +90,41 @@ export class DashboardScreen implements OnInit {
   }
 
   applyFilters() {
-    let filtered = [...this.posts];
+  let filtered = [...this.posts];
 
-    // Filtrar por categoría
-    if (this.activeCategory !== 'Todas') {
-      const categoriaObj = this.categorias.find(c => c.nombre === this.activeCategory);
-      if (categoriaObj) {
-        filtered = filtered.filter(post => post.categoria === categoriaObj.id);
-      }
+  // Filtrar por categoría
+  if (this.activeCategory !== 'Todas') {
+    const categoriaObj = this.categorias.find(c => c.nombre === this.activeCategory);
+    if (categoriaObj) {
+      filtered = filtered.filter(post => post.categoria === categoriaObj.id);
     }
+  }
 
-    // Filtrar por búsqueda
-    if (this.searchQuery.trim()) {
-      const query = this.searchQuery.toLowerCase();
-      filtered = filtered.filter(post =>
-        post.titulo.toLowerCase().includes(query) ||
-        post.contenido.toLowerCase().includes(query)
-      );
-    }
+  // Filtrar por búsqueda
+  if (this.searchQuery.trim()) {
+    const query = this.searchQuery.toLowerCase();
+    filtered = filtered.filter(post =>
+      post.titulo.toLowerCase().includes(query) ||
+      post.contenido.toLowerCase().includes(query)
+    );
+  }
 
-    // Ordenar
-    switch(this.sortBy) {
-      case 'recent':
-        filtered.sort((a, b) => new Date(b.fecha_creacion).getTime() - new Date(a.fecha_creacion).getTime());
-        break;
-      case 'popular':
-        filtered.sort((a, b) => b.vistas - a.vistas);
-        break;
-      case 'comments':
-        filtered.sort((a, b) => (b.comentarios_count || 0) - (a.comentarios_count || 0));
-        break;
-    }
+  // Ordenar - CORREGIDO
+  switch(this.sortBy) {
+    case 'recent':
+      filtered.sort((a, b) => new Date(b.fecha_creacion).getTime() - new Date(a.fecha_creacion).getTime());
+      break;
+    case 'popular':
+      // Usar 'vistas' en lugar de 'vote_count'
+      filtered.sort((a, b) => (b.vistas || 0) - (a.vistas || 0));
+      break;
+    case 'comments':
+      // Usar 'comentarios_count' o un valor por defecto
+      filtered.sort((a, b) => (b.comentarios_count || 0) - (a.comentarios_count || 0));
+      break;
+  }
 
-    this.filteredPosts = filtered;
+  this.filteredPosts = filtered;
   }
 
   onSearchChange() {
