@@ -1,0 +1,62 @@
+<div class="report-modal">
+  <div class="modal-header">
+    <h2 mat-dialog-title>Reportar Publicación</h2>
+    <button class="close-btn" (click)="onCancel()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content>
+    <div class="post-info">
+      <mat-icon>flag</mat-icon>
+      <span>Estás reportando: <strong>{{ data.postTitle }}</strong></span>
+    </div>
+
+    <div class="form-group">
+      <label for="motivo">Motivo del reporte *</label>
+      <select id="motivo" class="form-control" [(ngModel)]="motivo">
+        <option value="">Selecciona un motivo</option>
+        <option value="spam">Spam o contenido engañoso</option>
+        <option value="contenido_inapropiado">Contenido inapropiado</option>
+        <option value="acoso">Acoso o intimidación</option>
+        <option value="lenguaje_ofensivo">Lenguaje ofensivo</option>
+        <option value="informacion_falsa">Información falsa</option>
+        <option value="derechos_autor">Violación de derechos de autor</option>
+        <option value="otro">Otro</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="razon">Razón detallada *</label>
+      <textarea 
+        id="razon" 
+        class="form-control" 
+        rows="4" 
+        [(ngModel)]="razon"
+        placeholder="Describe detalladamente el motivo de tu reporte..."></textarea>
+      <small class="char-counter">{{ razon.length }}/500</small>
+    </div>
+
+    <div class="alert alert-info" *ngIf="!isLoggedIn">
+      <mat-icon>info</mat-icon>
+      <span>Debes iniciar sesión para reportar contenido.</span>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button class="cancel-btn" (click)="onCancel()">
+      Cancelar
+    </button>
+    <button 
+      mat-raised-button 
+      class="submit-btn" 
+      [disabled]="!isFormValid() || submitting || !isLoggedIn"
+      (click)="onSubmit()">
+      <span *ngIf="!submitting">Enviar Reporte</span>
+      <span *ngIf="submitting">
+        <span class="spinner-border spinner-border-sm me-2"></span>
+        Enviando...
+      </span>
+    </button>
+  </mat-dialog-actions>
+</div>

@@ -1,0 +1,84 @@
+<div class="comments-modal">
+  <div class="modal-header">
+    <h2 mat-dialog-title>Comentarios</h2>
+    <button class="close-btn" (click)="onClose()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content>
+    <div class="post-title">
+      <mat-icon>chat_bubble_outline</mat-icon>
+      <span>{{ data.postTitle }}</span>
+    </div>
+
+    <!-- Lista de comentarios -->
+    <div class="comments-list" *ngIf="!loadingComments">
+      <div *ngIf="comments.length === 0" class="empty-comments">
+        <mat-icon>comment</mat-icon>
+        <p>No hay comentarios aún. ¡Sé el primero en comentar!</p>
+      </div>
+
+      <div *ngFor="let comment of comments" class="comment-item">
+        <div class="comment-avatar">
+          <mat-icon>person</mat-icon>
+        </div>
+        <div class="comment-content">
+          <div class="comment-header">
+            <span class="comment-author">{{ comment.autor_nombre }}</span>
+            <span class="comment-date">{{ formatDate(comment.fecha_creacion) }}</span>
+          </div>
+          <p class="comment-text">{{ comment.contenido }}</p>
+          <div class="comment-actions" *ngIf="canDeleteComment(comment)">
+            <button class="delete-comment" (click)="deleteComment(comment.id)">
+              <mat-icon>delete_outline</mat-icon>
+              Eliminar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="loadingComments" class="text-center py-4">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+
+    <!-- Formulario para nuevo comentario -->
+    <div class="new-comment">
+      <div class="form-group" *ngIf="isLoggedIn">
+        <label for="nuevoComentario">Escribe un comentario</label>
+        <textarea 
+          id="nuevoComentario" 
+          class="form-control" 
+          rows="3" 
+          [(ngModel)]="nuevoComentario"
+          placeholder="Comparte tu opinión sobre esta publicación..."
+          maxlength="1000"></textarea>
+        <small class="char-counter">{{ nuevoComentario.length }}/1000</small>
+      </div>
+
+      <div class="alert alert-warning" *ngIf="!isLoggedIn">
+        <mat-icon>lock</mat-icon>
+        <span>Debes iniciar sesión para comentar.</span>
+      </div>
+
+      <div class="form-actions" *ngIf="isLoggedIn">
+        <button 
+          class="submit-comment" 
+          [disabled]="!isFormValid() || submittingComment"
+          (click)="submitComment()">
+          <span *ngIf="!submittingComment">
+            <mat-icon>send</mat-icon>
+            Publicar comentario
+          </span>
+          <span *ngIf="submittingComment">
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Publicando...
+          </span>
+        </button>
+      </div>
+    </div>
+  </mat-dialog-content>
+</div>

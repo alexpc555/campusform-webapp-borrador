@@ -14,6 +14,7 @@ export interface Post {
   autor_nombre?: string;
   etiquetas?: string;
   vistas: number;
+  comentarios_count?: number; // Agregar este campo opcional
   fecha_creacion: string;
   fecha_actualizacion: string;
 }
@@ -135,4 +136,14 @@ export class PostService {
       })
     );
   }
+  
+
+
+
+
+
+
+
+
+
 }
