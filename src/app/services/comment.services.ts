@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { AuthService } from './auth.services';
+import { environment } from '../../environments/environment';
 
 export interface Comment {
   id: number;
@@ -17,8 +18,8 @@ export interface Comment {
   providedIn: 'root'
 })
 export class CommentService {
-  private apiUrl = 'http://localhost:8000/api';
-
+  private apiUrl = environment.apiUrl;
+  
   constructor(
     private http: HttpClient,
     private auth: AuthService

@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { AuthService } from './auth.services';
-
+import { environment } from '../../environments/environment';
 export interface Post {
   id: number;
   titulo: string;
@@ -30,7 +30,7 @@ export interface CreatePostPayload {
   providedIn: 'root'
 })
 export class PostService {
-  private apiUrl = 'http://localhost:8000/api';
+ private apiUrl = environment.apiUrl;
 
   constructor(
     private http: HttpClient,

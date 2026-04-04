@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { AuthService } from './auth.services';
+import { environment } from '../../environments/environment';
 
 export interface Category {
   id: number;
@@ -25,7 +26,7 @@ export interface CreateCategoryPayload {
 })
 export class CategoryService {
   //  TU BACKEND REAL ES /api/...
-  private apiUrl = 'http://localhost:8000/api';
+  private apiUrl = environment.apiUrl;
 
   constructor(
     private http: HttpClient,
