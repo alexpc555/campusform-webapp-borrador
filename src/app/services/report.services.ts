@@ -37,7 +37,7 @@ export class ReportService {
     return headers;
   }
 
-  createReport(payload: { post_id: number; motivo: string; razon: string }): Observable<Report> {
+  createReport(payload: { post: number; motivo: string; razon: string }): Observable<any> {
     const url = `${this.apiUrl}/reportes/`;
     return this.http.post<Report>(url, payload, { headers: this.authHeaders() }).pipe(
       catchError(error => {

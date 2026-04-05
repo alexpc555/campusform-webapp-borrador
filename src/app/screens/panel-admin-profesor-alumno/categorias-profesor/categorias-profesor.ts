@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { CategoryService, Category, CreateCategoryPayload } from '../../../services/category.services';
+import { AuthService } from '../../../services/auth.services';
 
 @Component({
   selector: 'app-categorias-profesor',
@@ -26,7 +27,8 @@ export class CategoriasProfesor implements OnInit {
 
   constructor(
     private router: Router,
-    private categoryService: CategoryService
+    private categoryService: CategoryService,
+    private auth: AuthService
   ) {}
 
   ngOnInit() {
@@ -42,6 +44,28 @@ export class CategoriasProfesor implements OnInit {
     );
   }
 
+// Funciones para verificar permisos de edición y eliminación
+canEditCategory(category: Category): boolean {
+  const user = this.auth.getCurrentUser();
+  if (!user) return false;
+
+  if (user.role === 'admin') return true;
+
+  if (user.role === 'teacher') {
+    return category.creador_tipo === 'teacher';
+  }
+
+  return false;
+}
+
+canDeleteCategory(category: Category): boolean {
+  const user = this.auth.getCurrentUser();
+  if (!user) return false;
+
+  return user.role === 'admin';
+}
+  
+// Carga todas las categorías desde el backend  
   loadCategories() {
     this.loading = true;
     this.errorMessage = '';
@@ -128,7 +152,7 @@ export class CategoriasProfesor implements OnInit {
       }
     });
   }
-
+  
   deleteCategory(cat: Category) {
     if (!confirm(`¿Eliminar categoría "${cat.nombre}"?`)) return;
     
@@ -148,6 +172,12 @@ export class CategoriasProfesor implements OnInit {
     });
   }
 
+
+  
+
+
+
+  // Función para volver al panel principal del profesor
   volver() {
     this.router.navigate(['/profesor']);
   }

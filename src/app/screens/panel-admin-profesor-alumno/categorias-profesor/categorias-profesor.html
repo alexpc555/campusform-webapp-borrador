@@ -124,21 +124,19 @@
               </td>
 
               <td class="text-end">
-                <ng-container *ngIf="editingId !== c.id; else editActions">
-                  <button class="btn btn-link text-decoration-none me-2" 
-                          (click)="startEdit(c)" 
-                          title="Editar"
-                          [disabled]="loading">
-                    <i class="bi bi-pencil-square"></i>
-                  </button>
-                  <button class="btn btn-link text-decoration-none text-danger" 
-                          (click)="deleteCategory(c)" 
-                          title="Eliminar"
-                          [disabled]="loading">
-                    <i class="bi bi-trash3"></i>
-                  </button>
-                </ng-container>
+               <ng-container *ngIf="editingId !== c.id; else editActions">
+  <button *ngIf="canEditCategory(c)"
+          class="btn btn-link text-decoration-none me-2" 
+          (click)="startEdit(c)" 
+          title="Editar"
+          [disabled]="loading">
+    <i class="bi bi-pencil-square"></i>
+  </button>
 
+  <span *ngIf="!canEditCategory(c)" class="text-muted small">
+    Creada por {{ c.creador_nombre }} ({{ c.creador_tipo }} )
+  </span>
+</ng-container>
                 <ng-template #editActions>
                   <button class="btn btn-outline-success btn-sm me-2" 
                           (click)="saveEdit(c)"

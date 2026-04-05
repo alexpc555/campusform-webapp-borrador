@@ -10,8 +10,8 @@ export interface Category {
   nombre: string;
   descripcion: string;
   post_count: number;
-  creada_por: number;
-  creada_por_nombre: string;
+  creador_nombre: string;
+  creador_tipo: string;
   fecha_creacion: string;
   fecha_actualizacion: string;
 }

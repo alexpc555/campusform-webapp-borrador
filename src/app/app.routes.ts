@@ -18,39 +18,107 @@ import { ComentariosAlumno } from './screens/panel-admin-profesor-alumno/comenta
 import { PostAlumno } from './screens/panel-admin-profesor-alumno/post-alumno/post-alumno';
 import { ReportesAlumno } from './screens/panel-admin-profesor-alumno/reportes-alumno/reportes-alumno';
 
-export const routes: Routes = [
+import { authGuard } from './guards/auth.guard';
+import { roleGuard } from './guards/role.guard';
 
+export const routes: Routes = [
   { path: '', component: LandigPage },
 
   { path: 'login', component: LoginScreen },
-
   { path: 'register', component: Registro },
 
   // Rutas de Profesor
-  { path: 'profesor', component: ProfesorScreen },
-  { path: 'profesor/post', component: PostProfesor },
-  { path: 'profesor/categorias', component: CategoriasProfesor },
-  { path: 'profesor/reportes', component: ReportesProfesor },
+  {
+    path: 'profesor',
+    component: ProfesorScreen,
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'teacher' }
+  },
+  {
+    path: 'profesor/post',
+    component: PostProfesor,
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'teacher' }
+  },
+  {
+    path: 'profesor/categorias',
+    component: CategoriasProfesor,
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'teacher' }
+  },
+  {
+    path: 'profesor/reportes',
+    component: ReportesProfesor,
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'teacher' }
+  },
 
   // Analytics
-  { path: 'analytics-page', component: AnalyticsPageComponent },
+  {
+    path: 'analytics-page',
+    component: AnalyticsPageComponent,
+    canActivate: [authGuard]
+  },
 
-  // Dashboard principal (con todo integrado)
-  { path: 'dashboard', component: DashboardScreen, pathMatch: 'full' },
+  // Dashboard principal
+  {
+    path: 'dashboard',
+    component: DashboardScreen,
+    pathMatch: 'full',
+    canActivate: [authGuard]
+  },
 
   // Rutas de Admin
-  { path: 'admin', component: AdminScreen },
-  { path: 'admin/usuarios', component: GestionUsuario },
-  { path: 'admin/categorias', component: CategoriasAdministracion },
-  { path: 'admin/reportes', component: ReportesAdmin },
+  {
+    path: 'admin',
+    component: AdminScreen,
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'admin' }
+  },
+  {
+    path: 'admin/usuarios',
+    component: GestionUsuario,
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'admin' }
+  },
+  {
+    path: 'admin/categorias',
+    component: CategoriasAdministracion,
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'admin' }
+  },
+  {
+    path: 'admin/reportes',
+    component: ReportesAdmin,
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'admin' }
+  },
 
   // Rutas de Estudiante
-  { path: 'student-panel', component: StudentPanelComponent },
-  { path: 'student-panel/post', component: PostAlumno },
-  { path: 'student-panel/comentarios', component: ComentariosAlumno },
-  { path: 'student-panel/reportes', component: ReportesAlumno },
+  {
+    path: 'student-panel',
+    component: StudentPanelComponent,
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'student' }
+  },
+  {
+    path: 'student-panel/post',
+    component: PostAlumno,
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'student' }
+  },
+  {
+    path: 'student-panel/comentarios',
+    component: ComentariosAlumno,
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'student' }
+  },
+  {
+    path: 'student-panel/reportes',
+    component: ReportesAlumno,
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'student' }
+  },
 
-  // Redirección por defecto
   { path: '**', redirectTo: '' }
-
 ];

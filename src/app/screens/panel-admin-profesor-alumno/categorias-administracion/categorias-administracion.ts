@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { CategoryService, Category, CreateCategoryPayload } from '../../../services/category.services';
+import { AuthService } from '../../../services/auth.services';
+
 
 @Component({
   selector: 'app-categorias-administracion',
@@ -24,8 +26,10 @@ export class CategoriasAdministracion implements OnInit {
   editingId: number | null = null;
   editForm: CreateCategoryPayload = { nombre: '', descripcion: '' };
 
-  constructor(private categoryService: CategoryService) {}
-
+  constructor(
+  private categoryService: CategoryService,
+  private auth: AuthService
+) {}
   ngOnInit() {
     this.loadCategories();
   }
@@ -39,6 +43,27 @@ export class CategoriasAdministracion implements OnInit {
     );
   }
 
+  //funciones para crear, editar y eliminar categorías (similar a CategoriasProfesor pero con permisos de admin)
+canEditCategory(category: Category): boolean {
+  const user = this.auth.getCurrentUser();
+  if (!user) return false;
+
+  if (user.role === 'admin') return true;
+
+  if (user.role === 'teacher') {
+    return category.creador_tipo === 'teacher';
+  }
+
+  return false;
+}
+
+canDeleteCategory(category: Category): boolean {
+  const user = this.auth.getCurrentUser();
+  if (!user) return false;
+
+  return user.role === 'admin';
+}
+// Carga todas las categorías desde el backend
   loadCategories() {
     this.loading = true;
     this.errorMessage = '';

@@ -60,7 +60,7 @@ export class ReportModalComponent {
     this.submitting = true;
 
     const reportData = {
-      post_id: this.data.postId,
+      post: this.data.postId,
       motivo: this.motivo,
       razon: this.razon.trim()
     };

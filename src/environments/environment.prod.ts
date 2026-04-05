@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://campus-forum/api'
+  apiUrl: 'https://campusform-api.onrender.com/api'
 };

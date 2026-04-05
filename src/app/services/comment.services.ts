@@ -46,7 +46,7 @@ export class CommentService {
     );
   }
 
-  createComment(payload: { post_id: number; contenido: string }): Observable<Comment> {
+ createComment(payload: { post: number; contenido: string }): Observable<any> {
     const url = `${this.apiUrl}/comentarios/`;
     return this.http.post<Comment>(url, payload, { headers: this.authHeaders() }).pipe(
       catchError(error => {

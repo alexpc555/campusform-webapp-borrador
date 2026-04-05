@@ -95,7 +95,7 @@ export class CommentsModalComponent implements OnInit {
     this.submittingComment = true;
 
     const commentData = {
-      post_id: this.data.postId,
+      post: this.data.postId,
       contenido: this.nuevoComentario.trim()
     };
 
