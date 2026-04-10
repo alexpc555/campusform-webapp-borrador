@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+import { AuthService } from '../../services/auth.services';
 
 @Component({
   selector: 'app-admin-screen',
@@ -9,5 +10,17 @@ import { RouterModule } from '@angular/router';
   templateUrl: './admin-screen.html',
   styleUrls: ['./admin-screen.scss'],
 })
+export class AdminScreen {
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {}
 
-export class AdminScreen {}
+  irAlDashboard(): void {
+    this.router.navigate(['/dashboard']);
+  }
+
+  salir(): void {
+    this.authService.logout();
+  }
+}

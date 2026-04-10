@@ -10,9 +10,18 @@
       </a>
 
       <div class="ms-auto d-flex align-items-center gap-2">
-        <span class="badge badge-soft d-none d-md-inline">Admin</span>
-        <a class="btn btn-outline-primary" routerLink="/login">Salir</a>
-      </div>
+  <span class="badge badge-soft d-none d-md-inline">Admin</span>
+
+  <button class="btn btn-outline-primary" (click)="irAlDashboard()">
+    <i class="bi bi-chat-dots me-1"></i>
+    Ir al dashboard
+  </button>
+
+  <button class="btn btn-outline-danger" (click)="salir()">
+    Salir
+  </button>
+</div>
+      
     </div>
   </nav>
 
