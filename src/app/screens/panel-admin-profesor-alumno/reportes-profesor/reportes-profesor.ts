@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
+import { ReportService, Report } from '../../../services/report.services';
 
 @Component({
   selector: 'app-reportes-profesor',
@@ -9,30 +10,38 @@ import { RouterModule, Router } from '@angular/router';
   templateUrl: './reportes-profesor.html',
   styleUrls: ['./reportes-profesor.scss'],
 })
-export class ReportesProfesor {
+export class ReportesProfesor implements OnInit {
+  reports: Report[] = [];
+  loading = false;
+  errorMessage = '';
 
-  constructor(private router: Router){}
+  constructor(
+    private router: Router,
+    private reportService: ReportService
+  ) {}
 
-  volver(){
+  ngOnInit(): void {
+    this.loadReports();
+  }
+
+  volver() {
     this.router.navigate(['/profesor']);
   }
 
-  reportes = [
-    {
-      titulo: 'Publicaciones realizadas',
-      valor: 15,
-      descripcion: 'Total de publicaciones creadas'
-    },
-    {
-      titulo: 'Interacciones',
-      valor: 120,
-      descripcion: 'Comentarios en publicaciones'
-    },
-    {
-      titulo: 'Categoría más activa',
-      valor: 'Programación',
-      descripcion: 'Categoría con mayor actividad'
-    }
-  ];
+  loadReports(): void {
+    this.loading = true;
+    this.errorMessage = '';
 
+    this.reportService.getReports().subscribe({
+      next: (data) => {
+        this.reports = data;
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Error cargando reportes:', err);
+        this.errorMessage = 'No se pudieron cargar los reportes.';
+        this.loading = false;
+      }
+    });
+  }
 }

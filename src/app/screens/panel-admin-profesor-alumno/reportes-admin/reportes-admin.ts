@@ -1,24 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
-
-type ReportStatus = 'pending' | 'resolved' | 'dismissed';
-type ReportType = 'post' | 'comment';
-type Severity = 'low' | 'medium' | 'high';
-
-interface Report {
-  id: number;
-  type: ReportType;
-  contentTitle: string;
-  reporter: string;
-  reportedUser: string;
-  reason: string;
-  description: string;
-  date: string;
-  status: ReportStatus;
-  severity: Severity;
-}
+import { Router, RouterModule } from '@angular/router';
+import { ReportService, Report } from '../../../services/report.services';
 
 @Component({
   selector: 'app-reportes-admin',
@@ -27,142 +11,141 @@ interface Report {
   templateUrl: './reportes-admin.html',
   styleUrls: ['./reportes-admin.scss'],
 })
-export class ReportesAdmin {
-  // demo data
-  reports: Report[] = [/*
-    {
-      id: 1,
-      type: 'post',
-      contentTitle: 'Spam sobre venta de productos',
-      reporter: 'Juan Pérez',
-      reportedUser: 'Pedro Sánchez',
-      reason: 'Contenido comercial no permitido',
-      description: 'Publicó links de venta repetidas veces en varias categorías.',
-      date: '2024-02-01',
-      status: 'pending',
-      severity: 'high',
-    },
-    {
-      id: 2,
-      type: 'comment',
-      contentTitle: 'Lenguaje ofensivo en comentario',
-      reporter: 'María García',
-      reportedUser: 'Juan Pérez',
-      reason: 'Uso de lenguaje inapropiado',
-      description: 'Insultos directos a otro usuario en hilo de Matemáticas.',
-      date: '2024-02-01',
-      status: 'pending',
-      severity: 'medium',
-    },
-    {
-      id: 3,
-      type: 'post',
-      contentTitle: 'Información errónea sobre exámenes',
-      reporter: 'Carlos López',
-      reportedUser: 'Ana Martínez',
-      reason: 'Desinformación',
-      description: 'Publicación con fechas falsas; ya se corrigió en comentarios.',
-      date: '2024-01-31',
-      status: 'resolved',
-      severity: 'low',
-    },
-    {
-      id: 4,
-      type: 'comment',
-      contentTitle: 'Plagio de contenido académico',
-      reporter: 'Ana Martínez',
-      reportedUser: 'María García',
-      reason: 'Violación de derechos de autor',
-      description: 'Copió texto completo de un libro sin citar.',
-      date: '2024-01-31',
-      status: 'dismissed',
-      severity: 'high',
-    },
-  */];
+export class ReportesAdmin implements OnInit {
+  reports: Report[] = [];
+  loading = false;
+  errorMessage = '';
 
-  // filters
-  statusFilter: 'all' | ReportStatus = 'pending';
-  typeFilter: 'all' | ReportType = 'all';
+  statusFilter: 'all' | 'pendiente' | 'revisado' | 'resuelto' = 'pendiente';
   search = '';
 
-  // modal
   showDetails = false;
   selected: Report | null = null;
 
+  constructor(
+    private router: Router,
+    private reportService: ReportService
+  ) {}
+
+  ngOnInit(): void {
+    this.loadReports();
+  }
+
+  volver(): void {
+    this.router.navigate(['/admin']);
+  }
+
+  loadReports(): void {
+    this.loading = true;
+    this.errorMessage = '';
+
+    this.reportService.getReports().subscribe({
+      next: (data) => {
+        this.reports = data;
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Error cargando reportes:', err);
+        this.errorMessage = 'No se pudieron cargar los reportes.';
+        this.loading = false;
+      }
+    });
+  }
+
   get pendingCount(): number {
-    return this.reports.filter(r => r.status === 'pending').length;
+    return this.reports.filter(r => r.estado === 'pendiente').length;
   }
 
   get filteredReports(): Report[] {
     const q = this.search.trim().toLowerCase();
 
     return this.reports.filter(r => {
-      const matchesStatus = this.statusFilter === 'all' ? true : r.status === this.statusFilter;
-      const matchesType = this.typeFilter === 'all' ? true : r.type === this.typeFilter;
+      const matchesStatus =
+        this.statusFilter === 'all' ? true : r.estado === this.statusFilter;
 
       const matchesText =
         !q ||
-        r.contentTitle.toLowerCase().includes(q) ||
-        r.reason.toLowerCase().includes(q) ||
-        r.reporter.toLowerCase().includes(q) ||
-        r.reportedUser.toLowerCase().includes(q);
+        r.post_titulo.toLowerCase().includes(q) ||
+        r.motivo.toLowerCase().includes(q) ||
+        r.razon.toLowerCase().includes(q) ||
+        r.autor_nombre.toLowerCase().includes(q);
 
-      return matchesStatus && matchesType && matchesText;
+      return matchesStatus && matchesText;
     });
   }
 
-  // UI helpers
-  typeLabel(t: ReportType) {
-    return t === 'post' ? 'Publicación' : 'Comentario';
+  statusLabel(status: Report['estado']): string {
+    if (status === 'pendiente') return 'Pendiente';
+    if (status === 'revisado') return 'Revisado';
+    return 'Resuelto';
   }
 
-  statusLabel(s: ReportStatus) {
-    if (s === 'pending') return 'Pendiente';
-    if (s === 'resolved') return 'Resuelto';
-    return 'Desestimado';
+  statusClass(status: Report['estado']): string {
+    if (status === 'pendiente') return 'badge-pending';
+    if (status === 'revisado') return 'badge-review';
+    return 'badge-resolved';
   }
 
-  statusClass(s: ReportStatus) {
-    if (s === 'pending') return 'badge-pending';
-    if (s === 'resolved') return 'badge-resolved';
-    return 'badge-dismissed';
-  }
-
-  severityLabel(sev: Severity) {
-    if (sev === 'low') return 'Baja';
-    if (sev === 'medium') return 'Media';
-    return 'Alta';
-  }
-
-  severityClass(sev: Severity) {
-    if (sev === 'low') return 'sev-low';
-    if (sev === 'medium') return 'sev-medium';
-    return 'sev-high';
-  }
-
-  // actions
-  resolve(r: Report) {
-    this.reports = this.reports.map(x => (x.id === r.id ? { ...x, status: 'resolved' } : x));
-    if (this.selected?.id === r.id) this.selected = { ...r, status: 'resolved' };
-  }
-
-  dismiss(r: Report) {
-    this.reports = this.reports.map(x => (x.id === r.id ? { ...x, status: 'dismissed' } : x));
-    if (this.selected?.id === r.id) this.selected = { ...r, status: 'dismissed' };
-  }
-
-  reopen(r: Report) {
-    this.reports = this.reports.map(x => (x.id === r.id ? { ...x, status: 'pending' } : x));
-    if (this.selected?.id === r.id) this.selected = { ...r, status: 'pending' };
-  }
-
-  openDetails(r: Report) {
-    this.selected = r;
+  openDetails(report: Report): void {
+    this.selected = report;
     this.showDetails = true;
   }
 
-  closeDetails() {
+  closeDetails(): void {
     this.showDetails = false;
     this.selected = null;
+  }
+
+  marcarRevisado(report: Report): void {
+    this.updateEstado(report, 'revisado');
+  }
+
+  resolver(report: Report): void {
+    this.updateEstado(report, 'resuelto');
+  }
+
+  reabrir(report: Report): void {
+    this.updateEstado(report, 'pendiente');
+  }
+
+  eliminar(report: Report): void {
+    if (!confirm(`¿Eliminar el reporte #${report.id}?`)) return;
+
+    this.reportService.deleteReport(report.id).subscribe({
+      next: () => {
+        this.reports = this.reports.filter(r => r.id !== report.id);
+
+        if (this.selected?.id === report.id) {
+          this.closeDetails();
+        }
+      },
+      error: (err) => {
+        console.error('Error eliminando reporte:', err);
+        alert('No se pudo eliminar el reporte.');
+      }
+    });
+  }
+
+  private updateEstado(report: Report, nuevoEstado: 'pendiente' | 'revisado' | 'resuelto'): void {
+    const payload = {
+      post: report.post,
+      motivo: report.motivo,
+      razon: report.razon,
+      estado: nuevoEstado
+    };
+
+    this.reportService.updateReport(report.id, payload).subscribe({
+      next: (updated) => {
+        this.reports = this.reports.map(r => r.id === updated.id ? updated : r);
+
+        if (this.selected?.id === updated.id) {
+          this.selected = updated;
+        }
+      },
+      error: (err) => {
+        console.error('Error actualizando reporte:', err);
+        alert('No se pudo actualizar el estado del reporte.');
+      }
+    });
   }
 }

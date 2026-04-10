@@ -1,170 +1,143 @@
-<div class="landing-root">
-  <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-glass sticky-top border-bottom">
-    <div class="container py-2 position-relative">
-      <a class="navbar-brand d-flex align-items-center gap-2" routerLink="/admin">
-        <span class="brand-icon"><i class="bi bi-mortarboard-fill"></i></span>
-        <span class="brand-name">CampusForum</span>
-      </a>
+<nav class="navbar navbar-expand-lg navbar-glass sticky-top border-bottom">
+  <div class="container py-2 position-relative">
+    <a class="navbar-brand d-flex align-items-center gap-2">
+      <span class="brand-icon">
+        <i class="bi bi-mortarboard-fill"></i>
+      </span>
+      <span class="brand-name">CampusForum</span>
+    </a>
 
-      <div class="ms-auto d-flex align-items-center gap-2">
-        <span class="badge badge-soft d-none d-md-inline">
-          Admin • Reportes • Pendientes: {{ pendingCount }}
-        </span>
-        <a class="btn btn-outline-primary" routerLink="/admin">Volver</a>
-      </div>
+    <div class="ms-auto d-flex align-items-center gap-2">
+      <span class="badge badge-soft d-none d-md-inline">
+        Admin • Reportes • Pendientes: {{ pendingCount }}
+      </span>
+      <button class="btn btn-outline-primary" (click)="volver()">Volver</button>
     </div>
-  </nav>
+  </div>
+</nav>
 
-  <section class="container py-5">
-    <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 mb-4">
-      <div>
-        <h1 class="section-title mb-2">Reportes y Moderación</h1>
-        <p class="section-subtitle mb-0">Filtra, revisa y toma acciones sobre contenido reportado</p>
-      </div>
-
-      <div class="d-flex flex-wrap gap-2 align-items-center">
-        <input class="form-control form-control-sm search-input"
-               placeholder="Buscar por título, razón, reportado..."
-               [(ngModel)]="search" />
-
-        <select class="form-select form-select-sm w-auto" [(ngModel)]="typeFilter">
-          <option value="all">Todos</option>
-          <option value="post">Publicaciones</option>
-          <option value="comment">Comentarios</option>
-        </select>
-
-        <select class="form-select form-select-sm w-auto" [(ngModel)]="statusFilter">
-          <option value="all">Todos</option>
-          <option value="pending">Pendientes</option>
-          <option value="resolved">Resueltos</option>
-          <option value="dismissed">Desestimados</option>
-        </select>
-      </div>
+<section class="container py-5">
+  <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 mb-4">
+    <div>
+      <h1 class="section-title mb-2">Reportes y Moderación</h1>
+      <p class="section-subtitle mb-0">
+        Filtra, revisa y toma acciones sobre contenido reportado
+      </p>
     </div>
 
-    <!-- Lista -->
-    <div class="d-grid gap-3">
-      <div class="glass-card p-4 hover-lift" *ngFor="let r of filteredReports">
-        <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
-          <div class="flex-grow-1">
-            <div class="d-flex flex-wrap gap-2 mb-2">
-              <span class="badge badge-outline">{{ typeLabel(r.type) }}</span>
+    <div class="d-flex gap-2 align-items-center flex-wrap">
+      <input
+        class="form-control form-control-sm search-input"
+        placeholder="Buscar reporte..."
+        [(ngModel)]="search"
+      />
 
-              <span class="status-pill" [class]="statusClass(r.status)">
-                <i class="bi"
-                   [class.bi-clock]="r.status==='pending'"
-                   [class.bi-check-circle]="r.status==='resolved'"
-                   [class.bi-x-circle]="r.status==='dismissed'"></i>
-                <span class="ms-1">{{ statusLabel(r.status) }}</span>
-              </span>
-
-              <span class="severity-pill" [class]="severityClass(r.severity)">
-                <i class="bi bi-exclamation-triangle"></i>
-                <span class="ms-1">Severidad: {{ severityLabel(r.severity) }}</span>
-              </span>
-
-              <span class="badge badge-soft">Reportado: {{ r.reportedUser }}</span>
-            </div>
-
-            <h3 class="h5 fw-bold mb-2">{{ r.contentTitle }}</h3>
-
-            <div class="text-muted small d-flex flex-wrap gap-2 align-items-center mb-2">
-              <span>Reportado por: {{ r.reporter }}</span>
-              <span class="dot">•</span>
-              <span>{{ r.date }}</span>
-            </div>
-
-            <div class="text-muted">
-              <b class="text-dark">Razón:</b> {{ r.reason }}
-            </div>
-          </div>
-
-          <div class="d-flex gap-2 align-items-start justify-content-end flex-wrap">
-            <button class="btn btn-outline-primary btn-sm" (click)="openDetails(r)">
-              <i class="bi bi-eye me-1"></i> Ver detalles
-            </button>
-
-            <ng-container *ngIf="r.status==='pending'">
-              <button class="btn btn-outline-success btn-sm" (click)="resolve(r)">
-                <i class="bi bi-check2-circle me-1"></i> Resolver
-              </button>
-
-              <button class="btn btn-outline-secondary btn-sm" (click)="dismiss(r)">
-                Desestimar
-              </button>
-            </ng-container>
-
-            <ng-container *ngIf="r.status!=='pending'">
-              <button class="btn btn-outline-secondary btn-sm" (click)="reopen(r)">
-                <i class="bi bi-arrow-counterclockwise me-1"></i> Reabrir
-              </button>
-            </ng-container>
-          </div>
-        </div>
-      </div>
-
-      <div *ngIf="filteredReports.length===0" class="glass-card p-5 text-center">
-        <div class="empty-icon mb-2"><i class="bi bi-flag"></i></div>
-        <div class="section-subtitle">No hay reportes con esos filtros.</div>
-      </div>
+      <select class="form-select form-select-sm" [(ngModel)]="statusFilter">
+        <option value="all">Todos</option>
+        <option value="pendiente">Pendientes</option>
+        <option value="revisado">Revisados</option>
+        <option value="resuelto">Resueltos</option>
+      </select>
     </div>
-  </section>
+  </div>
 
-  <!-- Modal detalles -->
-  <div class="modal-backdrop" *ngIf="showDetails" (click)="closeDetails()"></div>
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary mb-3" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p class="text-muted">Cargando reportes...</p>
+  </div>
 
-  <div class="modal-glass" *ngIf="showDetails" role="dialog" aria-modal="true">
-    <div class="glass-card p-4">
-      <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+  <div *ngIf="errorMessage" class="alert alert-danger">
+    {{ errorMessage }}
+  </div>
+
+  <div class="glass-card p-3 p-md-4" *ngIf="!loading">
+    <div class="post-card mb-3" *ngFor="let r of filteredReports">
+      <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
         <div>
-          <h2 class="section-title h4 mb-1">Detalle del reporte</h2>
-          <div class="text-muted small">ID: {{ selected?.id }}</div>
+          <div class="d-flex gap-2 flex-wrap align-items-center mb-2">
+            <span class="badge badge-soft">Reporte</span>
+            <span class="badge" [ngClass]="statusClass(r.estado)">
+              {{ statusLabel(r.estado) }}
+            </span>
+          </div>
+
+          <h5 class="mb-1">{{ r.post_titulo }}</h5>
+          <p class="text-muted mb-2">
+            Reportado por: {{ r.autor_nombre }} • {{ r.fecha_creacion | date:'short' }}
+          </p>
+          <p class="mb-1"><strong>Motivo:</strong> {{ r.motivo }}</p>
+          <p class="mb-0">{{ r.razon }}</p>
         </div>
 
-        <button class="btn btn-link text-decoration-none" (click)="closeDetails()" title="Cerrar">
-          <i class="bi bi-x-lg"></i>
-        </button>
-      </div>
+        <div class="d-flex flex-column gap-2 align-items-lg-end">
+          <button class="btn btn-outline-secondary btn-sm" (click)="openDetails(r)">
+            Ver detalles
+          </button>
 
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge badge-outline">{{ typeLabel(selected?.type || 'post') }}</span>
-        <span class="status-pill" [class]="statusClass(selected?.status || 'pending')">
-          {{ statusLabel(selected?.status || 'pending') }}
-        </span>
-        <span class="severity-pill" [class]="severityClass(selected?.severity || 'low')">
-          Severidad: {{ severityLabel(selected?.severity || 'low') }}
-        </span>
-      </div>
+          <button class="btn btn-outline-warning btn-sm" (click)="marcarRevisado(r)">
+            Marcar revisado
+          </button>
 
-      <div class="mb-2">
-        <div class="fw-bold">{{ selected?.contentTitle }}</div>
-        <div class="text-muted small">
-          Reportado por: {{ selected?.reporter }} • Reportado: {{ selected?.reportedUser }} • {{ selected?.date }}
+          <button class="btn btn-outline-success btn-sm" (click)="resolver(r)">
+            Resolver
+          </button>
+
+          <button class="btn btn-outline-primary btn-sm" (click)="reabrir(r)">
+            Reabrir
+          </button>
+
+          <button class="btn btn-outline-danger btn-sm" (click)="eliminar(r)">
+            Eliminar
+          </button>
         </div>
       </div>
+    </div>
 
-      <div class="mb-3">
-        <div><b>Razón:</b> {{ selected?.reason }}</div>
-        <div class="text-muted mt-1">{{ selected?.description }}</div>
+    <div *ngIf="filteredReports.length === 0" class="text-center text-muted py-4">
+      No hay reportes con esos filtros.
+    </div>
+  </div>
+</section>
+
+<div class="modal-backdrop-custom" *ngIf="showDetails && selected">
+  <div class="modal-card-custom">
+    <div class="d-flex justify-content-between align-items-start mb-3">
+      <div>
+        <h4 class="mb-1">Detalle del reporte</h4>
+        <p class="text-muted mb-0">ID: {{ selected.id }}</p>
       </div>
+      <button class="btn btn-sm btn-outline-secondary" (click)="closeDetails()">Cerrar</button>
+    </div>
 
-      <div class="d-flex gap-2 justify-content-end flex-wrap">
-        <button class="btn btn-outline-secondary" (click)="closeDetails()">Cerrar</button>
+    <div class="mb-3">
+      <span class="badge" [ngClass]="statusClass(selected.estado)">
+        {{ statusLabel(selected.estado) }}
+      </span>
+    </div>
 
-        <ng-container *ngIf="selected?.status==='pending'">
-          <button class="btn btn-outline-success" (click)="resolve(selected!)">
-            <i class="bi bi-check2-circle me-1"></i> Resolver
-          </button>
-          <button class="btn btn-outline-secondary" (click)="dismiss(selected!)">Desestimar</button>
-        </ng-container>
+    <h5>{{ selected.post_titulo }}</h5>
+    <p class="text-muted">
+      Reportado por: {{ selected.autor_nombre }} • {{ selected.fecha_creacion | date:'short' }}
+    </p>
 
-        <ng-container *ngIf="selected?.status!=='pending'">
-          <button class="btn btn-outline-secondary" (click)="reopen(selected!)">
-            <i class="bi bi-arrow-counterclockwise me-1"></i> Reabrir
-          </button>
-        </ng-container>
-      </div>
+    <p><strong>Motivo:</strong> {{ selected.motivo }}</p>
+    <p>{{ selected.razon }}</p>
+
+    <div class="d-flex gap-2 flex-wrap mt-4">
+      <button class="btn btn-outline-warning btn-sm" (click)="marcarRevisado(selected)">
+        Marcar revisado
+      </button>
+      <button class="btn btn-outline-success btn-sm" (click)="resolver(selected)">
+        Resolver
+      </button>
+      <button class="btn btn-outline-primary btn-sm" (click)="reabrir(selected)">
+        Reabrir
+      </button>
+      <button class="btn btn-outline-danger btn-sm" (click)="eliminar(selected)">
+        Eliminar
+      </button>
     </div>
   </div>
 </div>

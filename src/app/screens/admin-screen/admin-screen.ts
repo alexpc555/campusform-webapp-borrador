@@ -9,4 +9,5 @@ import { RouterModule } from '@angular/router';
   templateUrl: './admin-screen.html',
   styleUrls: ['./admin-screen.scss'],
 })
+
 export class AdminScreen {}

@@ -1,112 +1,47 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
-import { Report } from '../../student-panel/student-panel';
+import { ReportService, Report } from '../../../services/report.services';
 
 @Component({
   selector: 'app-reportes-alumno',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './reportes-alumno.html',
   styleUrls: ['./reportes-alumno.scss'],
 })
-export class ReportesAlumno {
+export class ReportesAlumno implements OnInit {
+  reports: Report[] = [];
+  loading = false;
+  errorMessage = '';
 
-  constructor(private router: Router) { }
+  constructor(
+    private router: Router,
+    private reportService: ReportService
+  ) {}
 
-  modalAbierto = false;
-
-  tipoContenido = '';
-  tituloContenido = '';
-  razon = '';
-  descripcion = '';
-
-  error = '';
-
-  reports: Report[] = [
-    {
-      id: 1,
-      type: 'Publicación',
-      status: 'Pendiente',
-      title: 'Contenido spam inapropiado',
-      reason: 'Spam o publicidad',
-      description: 'Este post contiene publicidad no relacionada con temas académicos',
-      date: '2023-10-25',
-      timeAgo: 'Hace 1 día'
-    }
-  ];
-
-  abrirModal() {
-    this.modalAbierto = true;
-  }
-
-  cerrarModal() {
-    this.modalAbierto = false;
-    this.error = '';
+  ngOnInit(): void {
+    this.loadReports();
   }
 
   volver() {
     this.router.navigate(['/student-panel']);
   }
 
-  enviarReporte() {
+  loadReports(): void {
+    this.loading = true;
+    this.errorMessage = '';
 
-    if (!this.tipoContenido) {
-      this.error = "Debe seleccionar un tipo de contenido";
-      return;
-    }
-
-    if (!this.tituloContenido.trim()) {
-      this.error = "El título del contenido es obligatorio";
-      return;
-    }
-
-    if (this.tituloContenido.length > 150) {
-      this.error = "El título no puede superar los 150 caracteres";
-      return;
-    }
-
-    if (!this.razon) {
-      this.error = "Debe seleccionar una razón para el reporte";
-      return;
-    }
-
-    if (!this.descripcion.trim()) {
-      this.error = "La descripción es obligatoria";
-      return;
-    }
-
-    if (this.descripcion.length > 5000) {
-      this.error = "La descripción no puede superar los 5000 caracteres";
-      return;
-    }
-
-    this.error = '';
-
-    const now = new Date();
-    const reporte: Report = {
-      id: this.reports.length + 1,
-      type: this.tipoContenido,
-      status: 'Pendiente',
-      title: this.tituloContenido,
-      reason: this.razon,
-      description: this.descripcion,
-      date: now.toISOString().split('T')[0],
-      timeAgo: 'Ahora'
-    };
-
-    this.reports.unshift(reporte);
-
-    alert("Reporte enviado correctamente");
-
-    this.tipoContenido = '';
-    this.tituloContenido = '';
-    this.razon = '';
-    this.descripcion = '';
-
-    this.modalAbierto = false;
-
+    this.reportService.getReports().subscribe({
+      next: (data) => {
+        this.reports = data;
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Error cargando reportes:', err);
+        this.errorMessage = 'No se pudieron cargar tus reportes.';
+        this.loading = false;
+      }
+    });
   }
-
 }

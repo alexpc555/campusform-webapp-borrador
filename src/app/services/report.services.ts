@@ -12,7 +12,7 @@ export interface Report {
   motivo: string;
   razon: string;
   estado: 'pendiente' | 'revisado' | 'resuelto';
-  creado_por: number;
+  autor_nombre: string;
   fecha_creacion: string;
 }
 
@@ -21,6 +21,7 @@ export interface Report {
 })
 export class ReportService {
   private apiUrl = environment.apiUrl;
+
   constructor(
     private http: HttpClient,
     private auth: AuthService
@@ -31,13 +32,15 @@ export class ReportService {
     let headers = new HttpHeaders({
       'Content-Type': 'application/json',
     });
+
     if (token) {
       headers = headers.set('Authorization', `Bearer ${token}`);
     }
+
     return headers;
   }
 
-  createReport(payload: { post: number; motivo: string; razon: string }): Observable<any> {
+  createReport(payload: { post: number; motivo: string; razon: string }): Observable<Report> {
     const url = `${this.apiUrl}/reportes/`;
     return this.http.post<Report>(url, payload, { headers: this.authHeaders() }).pipe(
       catchError(error => {
@@ -52,6 +55,26 @@ export class ReportService {
     return this.http.get<Report[]>(url, { headers: this.authHeaders() }).pipe(
       catchError(error => {
         console.error('Error en getReports:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  updateReport(id: number, payload: Partial<Report>): Observable<Report> {
+    const url = `${this.apiUrl}/reportes/${id}/`;
+    return this.http.put<Report>(url, payload, { headers: this.authHeaders() }).pipe(
+      catchError(error => {
+        console.error('Error en updateReport:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  deleteReport(id: number): Observable<void> {
+    const url = `${this.apiUrl}/reportes/${id}/`;
+    return this.http.delete<void>(url, { headers: this.authHeaders() }).pipe(
+      catchError(error => {
+        console.error('Error en deleteReport:', error);
         return throwError(() => error);
       })
     );

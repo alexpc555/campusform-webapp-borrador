@@ -1,6 +1,5 @@
 <nav class="navbar navbar-expand-lg navbar-glass sticky-top border-bottom">
   <div class="container py-2 position-relative">
-
     <a class="navbar-brand d-flex align-items-center gap-2">
       <span class="brand-icon">
         <i class="bi bi-mortarboard-fill"></i>
@@ -9,46 +8,55 @@
     </a>
 
     <div class="ms-auto d-flex align-items-center gap-2">
-
       <button class="btn btn-outline-danger" (click)="volver()">
         <i class="bi bi-arrow-left me-1"></i>
         Volver
       </button>
-
     </div>
-
   </div>
 </nav>
 
-
-<div class="reportes-wrapper">
-
-  <div class="report-header">
-
-    <h2>Reportes</h2>
-    <p>Resumen de actividad del profesor</p>
-
+<div class="feed-wrapper">
+  <div class="feed-header">
+    <div>
+      <h2>Reportes Enviados</h2>
+<p>Consulta los reportes realizados desde tu cuenta de profesor</p>
+    </div>
   </div>
 
-
-  <div class="report-grid">
-
-    <div class="report-card" *ngFor="let reporte of reportes">
-
-      <h3 class="report-title">
-        {{reporte.titulo}}
-      </h3>
-
-      <p class="report-value">
-        {{reporte.valor}}
-      </p>
-
-      <span class="report-desc">
-        {{reporte.descripcion}}
-      </span>
-
+  <div class="posts-container">
+    <div *ngIf="loading" class="text-center py-5">
+      <p>Cargando reportes...</p>
     </div>
 
-  </div>
+    <div *ngIf="errorMessage" class="alert alert-danger">
+      {{ errorMessage }}
+    </div>
 
+    <div class="post-card" *ngFor="let report of reports">
+      <div class="post-header">
+        <div class="avatar">RP</div>
+        <div>
+          <h4>{{ report.post_titulo }}</h4>
+          <p>{{ report.fecha_creacion | date:'short' }}</p>
+        </div>
+      </div>
+
+      <p class="post-content mt-3">
+        <strong>Motivo:</strong> {{ report.motivo }}
+      </p>
+
+      <p class="post-content">
+        {{ report.razon }}
+      </p>
+
+      <div class="post-footer d-flex justify-content-between align-items-center">
+        <span class="tag">{{ report.estado }}</span>
+      </div>
+    </div>
+
+    <div *ngIf="!loading && reports.length === 0" class="text-center py-5">
+      <p>Aún no has enviado reportes.</p>
+    </div>
+  </div>
 </div>
