@@ -50,6 +50,10 @@ export class CommentsModalComponent implements OnInit {
     this.loadComments();
   }
 
+  onClose(): void {
+    this.dialogRef.close();
+  }
+
   loadComments() {
     this.loadingComments = true;
     this.commentService.getCommentsByPost(this.data.postId).subscribe({
@@ -70,7 +74,11 @@ export class CommentsModalComponent implements OnInit {
 
   canDeleteComment(comment: Comment): boolean {
     if (!this.currentUser) return false;
-    return comment.autor === this.currentUser.id || this.currentUser.role === 'admin';
+
+    return (
+      comment.autor_id === this.currentUser.id ||
+      this.currentUser.role === 'admin'
+    );
   }
 
   formatDate(dateString: string): string {
@@ -122,12 +130,14 @@ export class CommentsModalComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error al eliminar comentario:', err);
+
+        if (err.status === 403) {
+          alert('No tienes permiso para eliminar este comentario.');
+          return;
+        }
+
         alert('Error al eliminar el comentario.');
       }
     });
-  }
-
-  onClose(): void {
-    this.dialogRef.close();
   }
 }

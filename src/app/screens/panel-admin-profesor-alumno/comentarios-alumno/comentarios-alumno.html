@@ -1,64 +1,61 @@
 <nav class="navbar navbar-expand-lg navbar-glass sticky-top border-bottom">
-    <div class="container py-2 position-relative">
+  <div class="container py-2 position-relative">
+    <a class="navbar-brand d-flex align-items-center gap-2">
+      <span class="brand-icon">
+        <i class="bi bi-mortarboard-fill"></i>
+      </span>
+      <span class="brand-name">CampusForum</span>
+    </a>
 
-        <a class="navbar-brand d-flex align-items-center gap-2">
-            <span class="brand-icon">
-                <i class="bi bi-mortarboard-fill"></i>
-            </span>
-            <span class="brand-name">CampusForum</span>
-        </a>
-
-        <div class="ms-auto d-flex align-items-center gap-2">
-
-            <button class="btn btn-outline-danger" (click)="volver()">
-                <i class="bi bi-arrow-left me-1"></i>
-                Volver
-            </button>
-
-        </div>
-
+    <div class="ms-auto d-flex align-items-center gap-2">
+      <button class="btn btn-outline-danger" (click)="volver()">
+        <i class="bi bi-arrow-left me-1"></i>
+        Volver
+      </button>
     </div>
+  </div>
 </nav>
 
-
 <div class="feed-wrapper">
+  <div class="feed-header">
+    <div>
+      <h2>Historial de Comentarios</h2>
+      <p>Revisa y administra tus comentarios en la plataforma</p>
+    </div>
+  </div>
 
-    <div class="feed-header">
+  <div class="posts-container">
+
+    <div *ngIf="loading" class="text-center py-5">
+      <p>Cargando comentarios...</p>
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-danger">
+      {{ errorMessage }}
+    </div>
+
+    <div class="post-card" *ngFor="let comment of comments">
+      <div class="post-header">
+        <div class="avatar">AL</div>
+
         <div>
-            <h2>Historial de Comentarios</h2>
-            <p>Revisa y administra tus comentarios en la plataforma</p>
+          <h4>Comentario en post #{{ comment.post }}</h4>
+          <p>{{ comment.autor_nombre }} • {{ comment.fecha_creacion | date:'short' }}</p>
         </div>
+      </div>
+
+      <p class="post-content mt-3">
+        "{{ comment.contenido }}"
+      </p>
+
+      <div class="action-links">
+        <a (click)="verPostOriginal(comment.post)" style="cursor:pointer;">Ver Post Original</a>
+      </div>
     </div>
 
-
-    <div class="posts-container">
-
-        <div class="post-card" *ngFor="let comment of comments">
-
-            <div class="post-header">
-                <div class="avatar">AL</div>
-
-                <div>
-                    <h4>Has comentado en: {{ comment.postTitle }}</h4>
-                    <p>Alumno • {{ comment.date }} ({{ comment.timeAgo }})</p>
-                </div>
-
-            </div>
-
-            <p class="post-content mt-3">
-                "{{ comment.content }}"
-            </p>
-
-            <div class="action-links">
-                <a href="#">Ver Post Original</a>
-            </div>
-
-        </div>
-
-        <div *ngIf="comments.length === 0" class="text-center py-5">
-            <p>Aún no has hecho ningún comentario.</p>
-        </div>
-
+    <div *ngIf="!loading && comments.length === 0" class="text-center py-5">
+      <p>Aún no has hecho ningún comentario.</p>
     </div>
 
+  </div>
 </div>

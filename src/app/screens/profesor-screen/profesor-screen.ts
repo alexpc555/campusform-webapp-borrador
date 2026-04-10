@@ -24,7 +24,9 @@ export class ProfesorScreen {
   irReportes(){
     this.router.navigate(['/profesor/reportes']);
   }
-
+ irAlForo(): void {
+  this.router.navigate(['/dashboard']);
+}
  salir() {
   localStorage.removeItem('token');
   localStorage.removeItem('rol');

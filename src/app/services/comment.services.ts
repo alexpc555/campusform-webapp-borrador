@@ -9,9 +9,10 @@ export interface Comment {
   id: number;
   contenido: string;
   post: number;
-  autor: number;
   autor_nombre: string;
   fecha_creacion: string;
+  autor_id?: number;
+  autor_tipo?: string;
 }
 
 @Injectable({
@@ -45,7 +46,15 @@ export class CommentService {
       })
     );
   }
-
+getMyComments(): Observable<Comment[]> {
+  const url = `${this.apiUrl}/comentarios/mis-comentarios/`;
+  return this.http.get<Comment[]>(url, { headers: this.authHeaders() }).pipe(
+    catchError(error => {
+      console.error('Error en getMyComments:', error);
+      return throwError(() => error);
+    })
+  );
+}
  createComment(payload: { post: number; contenido: string }): Observable<any> {
     const url = `${this.apiUrl}/comentarios/`;
     return this.http.post<Comment>(url, payload, { headers: this.authHeaders() }).pipe(

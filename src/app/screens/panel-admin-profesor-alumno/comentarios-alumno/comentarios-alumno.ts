@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { Comment } from '../../student-panel/student-panel';
+import { CommentService, Comment } from '../../../services/comment.services';
 
 @Component({
   selector: 'app-comentarios-alumno',
@@ -10,29 +10,42 @@ import { Comment } from '../../student-panel/student-panel';
   templateUrl: './comentarios-alumno.html',
   styleUrls: ['./comentarios-alumno.scss'],
 })
-export class ComentariosAlumno {
+export class ComentariosAlumno implements OnInit {
+  comments: Comment[] = [];
+  loading = false;
+  errorMessage = '';
 
-  constructor(private router: Router) { }
+  constructor(
+    private router: Router,
+    private commentService: CommentService
+  ) {}
+
+  ngOnInit(): void {
+    this.loadComments();
+  }
 
   volver() {
     this.router.navigate(['/student-panel']);
   }
 
-  comments: Comment[] = [
-    {
-      id: 1,
-      postTitle: 'Pregunta sobre Cálculo Diferencial - Límites',
-      content: 'Puedes usar la regla de L\'Hôpital cuando tienes formas indeterminadas como 0/0 o ∞/∞',
-      date: '2023-10-25',
-      timeAgo: 'Hace 1 hora'
-    },
-    {
-      id: 2,
-      postTitle: 'Horarios de Biblioteca para exámenes finales',
-      content: 'Gracias por la información! Muy útil para planear mis sesiones de estudio.',
-      date: '2023-10-24',
-      timeAgo: 'Hace 2 días'
-    }
-  ];
+  loadComments(): void {
+    this.loading = true;
+    this.errorMessage = '';
 
+    this.commentService.getMyComments().subscribe({
+      next: (data) => {
+        this.comments = data;
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Error cargando comentarios:', err);
+        this.errorMessage = 'No se pudieron cargar tus comentarios.';
+        this.loading = false;
+      }
+    });
+  }
+
+  verPostOriginal(postId: number): void {
+    this.router.navigate(['/dashboard'], { queryParams: { postId } });
+  }
 }

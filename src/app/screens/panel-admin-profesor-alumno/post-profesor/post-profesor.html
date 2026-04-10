@@ -26,8 +26,8 @@
   <div class="feed-header">
 
     <div>
-      <h2>Feed de Publicaciones</h2>
-      <p>Comparte contenido académico con los estudiantes</p>
+      <h2>{{ editando ? 'Editar Publicación' : 'Nueva Publicación' }}</h2>
+<p>{{ editando ? 'Actualiza tu publicación académica' : 'Comparte tu conocimiento con la comunidad académica' }}</p>
     </div>
 
     <button class="btn-publicar" (click)="abrirModal()">
@@ -39,32 +39,55 @@
 
   <div class="posts-container">
 
-    <div class="post-card">
+  <div *ngIf="cargandoPosts" class="text-center py-4">
+    <div class="spinner-border text-primary mb-2" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p>Cargando publicaciones...</p>
+  </div>
 
-      <div class="post-header">
-        <div class="avatar">PR</div>
+  <div *ngIf="!cargandoPosts && posts.length === 0" class="text-center py-4">
+    <p>No has creado publicaciones todavía.</p>
+  </div>
 
-        <div>
-          <h4>Ejemplo de publicación académica</h4>
-          <p>Profesor • hace 1 hora</p>
-        </div>
+  <div class="post-card" *ngFor="let post of posts">
 
+    <div class="post-header">
+      <div class="avatar">
+        {{ getInitials(usuarioActual?.name || 'Profesor') }}
       </div>
 
-      <p class="post-content">
-        Este es un ejemplo de publicación dentro del feed académico del profesor.
-      </p>
-
-      <div class="post-footer">
-        <span class="tag">Programación</span>
+      <div>
+        <h4>{{ post.titulo }}</h4>
+        <p>{{ post.autor_nombre || 'Profesor' }} • {{ post.fecha_creacion | date:'short' }}</p>
       </div>
+    </div>
 
+    <p class="post-content">
+      {{ post.contenido }}
+    </p>
+
+    <div class="post-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <span class="tag">
+        {{ getNombreCategoria(post.categoria) }}
+      </span>
+
+      <div class="d-flex gap-2">
+        <button class="btn btn-sm btn-outline-primary" (click)="editarPost(post)">
+          <i class="bi bi-pencil-square me-1"></i>
+          Editar
+        </button>
+
+        <button class="btn btn-sm btn-outline-danger" (click)="eliminarPost(post)">
+          <i class="bi bi-trash3 me-1"></i>
+          Eliminar
+        </button>
+      </div>
     </div>
 
   </div>
 
 </div>
-
 
 
 <!-- MODAL -->
@@ -109,11 +132,13 @@
 
 <label for="categoria">Categoría</label>
 
-<select id="categoria" [(ngModel)]="categoria">
-  <option value="">Categoría</option>
-  <option>Programación</option>
-  <option>Matemáticas</option>
-  <option>Física</option>
+<select class="form-select"
+        [(ngModel)]="categoriaId"
+        [disabled]="loading">
+  <option [ngValue]="null">Selecciona una categoría</option>
+  <option *ngFor="let cat of categorias" [ngValue]="cat.id">
+    {{ cat.nombre }}
+  </option>
 </select>
 
     </div>
