@@ -34,7 +34,7 @@ export class LoginScreen {
   get password() { return this.form.get('password'); }
 
   forgotPassword() {
-    alert('📧 Recuperación de contraseña\n\nSe enviará un enlace a tu correo institucional para restablecer tu contraseña.');
+    alert(' Recuperación de contraseña\n\nSe enviará un enlace a tu correo institucional para restablecer tu contraseña.');
   }
 
   submit() {
@@ -54,11 +54,11 @@ export class LoginScreen {
     this.auth.login(credentials).subscribe({
       next: (response) => {
         this.submitting = false;
-        console.log('✅ Login exitoso:', response);
+        console.log(' Login exitoso:', response);
       },
       error: (err) => {
         this.submitting = false;
-        console.error('❌ Error login:', err);
+        console.error(' Error login:', err);
         
         // Analizar el error para mostrar mensajes específicos
         if (err.status === 401 || err.status === 400) {
@@ -66,28 +66,28 @@ export class LoginScreen {
           
           // Verificar si el error es por email no encontrado
           if (errorData?.email || (errorData && typeof errorData === 'object' && errorData.email)) {
-            this.errorMessage = '❌ No existe una cuenta con este correo electrónico.';
-            alert('❌ USUARIO NO ENCONTRADO\n\nNo existe una cuenta con el correo: ' + credentials.email + '\n\nVerifica que hayas escrito correctamente tu correo institucional.');
+            this.errorMessage = ' No existe una cuenta con este correo electrónico.';
+            alert(' USUARIO NO ENCONTRADO\n\nNo existe una cuenta con el correo: ' + credentials.email + '\n\nVerifica que hayas escrito correctamente tu correo institucional.');
           } 
           // Verificar si el error es por contraseña incorrecta
           else if (errorData?.password || (errorData && typeof errorData === 'object' && errorData.password)) {
-            this.errorMessage = '❌ Contraseña incorrecta. Intenta de nuevo.';
-            alert('❌ CONTRASEÑA INCORRECTA\n\nLa contraseña ingresada no es correcta.\n\nVerifica tu contraseña e intenta nuevamente.');
+            this.errorMessage = ' Contraseña incorrecta. Intenta de nuevo.';
+            alert(' CONTRASEÑA INCORRECTA\n\nLa contraseña ingresada no es correcta.\n\nVerifica tu contraseña e intenta nuevamente.');
           }
           // Error genérico de credenciales
           else {
-            this.errorMessage = '❌ Credenciales inválidas. Verifica tu correo y contraseña.';
-            alert('❌ CREDENCIALES INVÁLIDAS\n\nEl correo o la contraseña son incorrectos.\n\nPor favor, verifica tus datos e intenta nuevamente.');
+            this.errorMessage = ' Credenciales inválidas. Verifica tu correo y contraseña.';
+            alert(' CREDENCIALES INVÁLIDAS\n\nEl correo o la contraseña son incorrectos.\n\nPor favor, verifica tus datos e intenta nuevamente.');
           }
         } else if (err.status === 500) {
-          this.errorMessage = '⚠️ Error en el servidor. Intenta de nuevo más tarde.';
-          alert('⚠️ ERROR EN EL SERVIDOR\n\nOcurrió un error en el servidor.\n\nPor favor, intenta de nuevo más tarde.');
+          this.errorMessage = ' Error en el servidor. Intenta de nuevo más tarde.';
+          alert(' ERROR EN EL SERVIDOR\n\nOcurrió un error en el servidor.\n\nPor favor, intenta de nuevo más tarde.');
         } else if (err.status === 0) {
-          this.errorMessage = '⚠️ No se pudo conectar con el servidor. Verifica tu conexión.';
-          alert('⚠️ ERROR DE CONEXIÓN\n\nNo se pudo conectar con el servidor.\n\nVerifica que el backend esté corriendo en http://localhost:8000');
+          this.errorMessage = ' No se pudo conectar con el servidor. Verifica tu conexión.';
+          alert(' ERROR DE CONEXIÓN\n\nNo se pudo conectar con el servidor.\n\nVerifica que el backend esté corriendo en http://localhost:8000');
         } else {
-          this.errorMessage = '❌ Error al iniciar sesión. Intenta de nuevo.';
-          alert('❌ ERROR DE AUTENTICACIÓN\n\nOcurrió un error al intentar iniciar sesión.\n\nPor favor, intenta de nuevo más tarde.');
+          this.errorMessage = ' Error al iniciar sesión. Intenta de nuevo.';
+          alert(' ERROR DE AUTENTICACIÓN\n\nOcurrió un error al intentar iniciar sesión.\n\nPor favor, intenta de nuevo más tarde.');
         }
       }
     });
