@@ -1,114 +1,125 @@
-<div class="page">
-  <div class="container">
+<div class="login-root">
+  <div class="login-container">
 
     <!-- Logo -->
-    <a class="brand" routerLink="/">
-      <img class="brand__logo" src="assets/images/logo_buap.png" alt="BUAP Logo" />
-      <span class="brand__name">CampusForum</span>
+    <a class="brand fade-in-up" routerLink="/">
+      <div class="brand-logo-wrapper">
+        <img class="brand-logo" src="assets/images/logo_buap.png" alt="BUAP Logo" />
+      </div>
+      <span class="brand-name">CampusForum</span>
     </a>
 
     <!-- Card -->
-    <div class="card">
-      <div class="card__head">
-        <h1>Iniciar Sesión</h1>
-        <p>Accede con tu correo institucional</p>
+    <div class="login-card fade-in-up delay-1">
+      <div class="card-header">
+        <div class="header-icon">
+          <i class="bi bi-shield-lock-fill"></i>
+        </div>
+        <h1 class="card-title">Bienvenido de vuelta</h1>
+        <p class="card-subtitle">Accede con tu correo institucional</p>
       </div>
 
       <!-- Mensaje de error general -->
-      <div class="alert alert-danger" *ngIf="errorMessage" role="alert">
-        <i class="bi bi-exclamation-triangle-fill me-2"></i>
-        {{ errorMessage }}
+      <div class="alert-error" *ngIf="errorMessage">
+        <i class="bi bi-exclamation-circle-fill"></i>
+        <span>{{ errorMessage }}</span>
       </div>
 
-      <form [formGroup]="form" (ngSubmit)="submit()" class="form">
+      <form [formGroup]="form" (ngSubmit)="submit()" class="login-form">
 
         <!-- Email -->
-        <mat-form-field appearance="fill" floatLabel="always" class="full">
-          <mat-label>Correo Institucional</mat-label>
-          <mat-icon matPrefix>mail</mat-icon>
-
-          <input
-            matInput
-            type="email"
-            placeholder="ejemplo@alumno.buap.mx"
-            formControlName="email"
-          />
-
-          <mat-error *ngIf="email?.touched && email?.hasError('required')">
+        <div class="form-group" [class.has-error]="email?.touched && email?.invalid">
+          <label class="form-label">
+            <i class="bi bi-envelope-fill"></i>
+            Correo Institucional
+          </label>
+          <div class="input-wrapper">
+            <i class="bi bi-at input-icon"></i>
+            <input
+              type="email"
+              class="form-input"
+              placeholder="ejemplo@alumno.buap.mx"
+              formControlName="email"
+              [class.error]="email?.touched && email?.invalid"
+            />
+          </div>
+          <div class="error-message" *ngIf="email?.touched && email?.hasError('required')">
+            <i class="bi bi-info-circle-fill"></i>
             El correo es requerido
-          </mat-error>
+          </div>
+          <div class="error-message" *ngIf="email?.touched && email?.hasError('institutionalEmail')">
+            <i class="bi bi-info-circle-fill"></i>
+            Debe usar un correo institucional (&#64;alumno.buap.mx)
+          </div>
+        </div>
 
-          <mat-error *ngIf="email?.touched && email?.hasError('institutionalEmail')">
-            Debe usar un correo institucional (@alumno.buap.mx, @buap.mx o @admin.buap.mx)
-          </mat-error>
-        </mat-form-field>
-
-        <!-- Password input -->
-        <mat-form-field appearance="fill" floatLabel="always" class="full">
-          <mat-label>Contraseña</mat-label>
-          <mat-icon matPrefix>lock</mat-icon>
-
-          <input
-            matInput
-            [type]="hidePassword ? 'password' : 'text'"
-            placeholder="••••••••"
-            formControlName="password"
-          />
-          <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword">
-            <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
-          </button>
-
-          <mat-error *ngIf="password?.touched && password?.hasError('required')">
+        <!-- Password -->
+        <div class="form-group" [class.has-error]="password?.touched && password?.invalid">
+          <label class="form-label">
+            <i class="bi bi-key-fill"></i>
+            Contraseña
+          </label>
+          <div class="input-wrapper">
+            <i class="bi bi-lock-fill input-icon"></i>
+            <input
+              [type]="hidePassword ? 'password' : 'text'"
+              class="form-input"
+              placeholder="••••••••"
+              formControlName="password"
+              [class.error]="password?.touched && password?.invalid"
+            />
+            <button type="button" class="password-toggle" (click)="hidePassword = !hidePassword">
+              <i [class]="hidePassword ? 'bi bi-eye-slash-fill' : 'bi bi-eye-fill'"></i>
+            </button>
+          </div>
+          <div class="error-message" *ngIf="password?.touched && password?.hasError('required')">
+            <i class="bi bi-info-circle-fill"></i>
             La contraseña es requerida
-          </mat-error>
-
-          <mat-error *ngIf="password?.touched && password?.hasError('minLengthTrim')">
+          </div>
+          <div class="error-message" *ngIf="password?.touched && password?.hasError('minLengthTrim')">
+            <i class="bi bi-info-circle-fill"></i>
             La contraseña debe tener al menos 6 caracteres
-          </mat-error>
-        </mat-form-field>
+          </div>
+        </div>
 
-        <!-- Button -->
+
+
+        <!-- Submit Button -->
         <button
-          mat-raised-button
-          color="primary"
-          class="login-btn"
           type="submit"
+          class="submit-btn"
+          [class.loading]="submitting"
           [disabled]="submitting"
         >
-          <span *ngIf="!submitting">
-            <i class="bi bi-box-arrow-in-right me-2"></i>
+          <span *ngIf="!submitting" class="btn-content">
+            <i class="bi bi-box-arrow-in-right"></i>
             Iniciar Sesión
           </span>
-          <span *ngIf="submitting">
-            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+          <span *ngIf="submitting" class="btn-content">
+            <span class="spinner"></span>
             Ingresando...
           </span>
         </button>
       </form>
 
-      <div class="footer">
-        <span>¿No tienes cuenta?</span>
-        <a routerLink="/register" class="link link--strong">Regístrate aquí</a>
+      <!-- Divider -->
+      <div class="divider">
+        <span>¿Nuevo en CampusForum?</span>
       </div>
-      
-      <div class="mt-3 text-center">
-        <button class="link" (click)="forgotPassword()">¿Olvidaste tu contraseña?</button>
-      </div>
+
+      <!-- Register link -->
+      <a routerLink="/register" class="register-link">
+        <i class="bi bi-person-plus-fill"></i>
+        Crear una cuenta
+        <i class="bi bi-arrow-right"></i>
+      </a>
     </div>
 
-    <a routerLink="/" class="back">← Volver al inicio</a>
-
-    <!-- Enlaces de prueba (mantener para desarrollo) -->
-    <div class="test-links mt-4 p-3 bg-light rounded">
-      <p class="fw-bold mb-2"> Enlaces de prueba:</p>
-      <div class="d-flex flex-wrap gap-2">
-        <a routerLink="/profesor" class="btn btn-sm btn-outline-secondary">Vista Profesor</a>
-        <a routerLink="/admin" class="btn btn-sm btn-outline-secondary">Vista Admin</a>
-        <a routerLink="/analytics-page" class="btn btn-sm btn-outline-secondary">Analytics</a>
-        <a routerLink="/dashboard" class="btn btn-sm btn-outline-secondary">Dashboard</a>
-        <a routerLink="/student-panel" class="btn btn-sm btn-outline-secondary">Vista Alumno</a>
-      </div>
-    </div>
+    <!-- Back to home -->
+    <a routerLink="/" class="back-link fade-in-up delay-2">
+      <i class="bi bi-arrow-left"></i>
+      Volver al inicio
+    </a>
 
   </div>
 </div>

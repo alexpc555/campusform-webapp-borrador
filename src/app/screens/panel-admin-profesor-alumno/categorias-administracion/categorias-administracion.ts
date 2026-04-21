@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { CategoryService, Category, CreateCategoryPayload } from '../../../services/category.services';
 import { AuthService } from '../../../services/auth.services';
-
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-categorias-administracion',
@@ -13,7 +14,9 @@ import { AuthService } from '../../../services/auth.services';
   templateUrl: './categorias-administracion.html',
   styleUrls: ['./categorias-administracion.scss'],
 })
-export class CategoriasAdministracion implements OnInit {
+export class CategoriasAdministracion implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+  
   categories: Category[] = [];
   loading = false;
   errorMessage = '';
@@ -27,62 +30,69 @@ export class CategoriasAdministracion implements OnInit {
   editForm: CreateCategoryPayload = { nombre: '', descripcion: '' };
 
   constructor(
-  private categoryService: CategoryService,
-  private auth: AuthService
-) {}
+    private categoryService: CategoryService,
+    private auth: AuthService
+  ) {}
+
   ngOnInit() {
     this.loadCategories();
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   get filteredCategories(): Category[] {
     const q = this.search.trim().toLowerCase();
     if (!q) return this.categories;
+    
     return this.categories.filter(c =>
       c.nombre.toLowerCase().includes(q) ||
       c.descripcion.toLowerCase().includes(q)
     );
   }
 
-  //funciones para crear, editar y eliminar categorías (similar a CategoriasProfesor pero con permisos de admin)
-canEditCategory(category: Category): boolean {
-  const user = this.auth.getCurrentUser();
-  if (!user) return false;
+  // Funciones de permisos
+  canEditCategory(category: Category): boolean {
+    const user = this.auth.getCurrentUser();
+    if (!user) return false;
 
-  if (user.role === 'admin') return true;
-
-  if (user.role === 'teacher') {
-    return category.creador_tipo === 'teacher';
+    if (user.role === 'admin') return true;
+    if (user.role === 'teacher') {
+      return category.creador_tipo === 'teacher';
+    }
+    return false;
   }
 
-  return false;
-}
+  canDeleteCategory(category: Category): boolean {
+    const user = this.auth.getCurrentUser();
+    if (!user) return false;
+    return user.role === 'admin';
+  }
 
-canDeleteCategory(category: Category): boolean {
-  const user = this.auth.getCurrentUser();
-  if (!user) return false;
-
-  return user.role === 'admin';
-}
-// Carga todas las categorías desde el backend
+  // Carga todas las categorías desde el backend
   loadCategories() {
     this.loading = true;
     this.errorMessage = '';
 
-    this.categoryService.getCategories().subscribe({
-      next: (data) => {
-        this.categories = data;
-        this.loading = false;
-      },
-      error: (err) => {
-        console.error('Error cargando categorías:', err);
-        this.errorMessage = 'Error al cargar las categorías. Intenta de nuevo.';
-        this.loading = false;
-        
-        if (err.status === 401) {
-          this.errorMessage = 'No autorizado. Por favor, inicia sesión nuevamente.';
+    this.categoryService.getCategories()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data) => {
+          this.categories = data;
+          this.loading = false;
+        },
+        error: (err) => {
+          console.error('Error cargando categorías:', err);
+          this.errorMessage = 'Error al cargar las categorías. Intenta de nuevo.';
+          this.loading = false;
+          
+          if (err.status === 401) {
+            this.errorMessage = 'No autorizado. Por favor, inicia sesión nuevamente.';
+          }
         }
-      }
-    });
+      });
   }
 
   createCategory() {
@@ -97,21 +107,28 @@ canDeleteCategory(category: Category): boolean {
     this.loading = true;
     this.errorMessage = '';
 
-    this.categoryService.createCategory({ nombre, descripcion }).subscribe({
-      next: (newCat) => {
-        this.categories = [newCat, ...this.categories];
-        this.newCategory = { nombre: '', descripcion: '' };
-        this.loading = false;
-      },
-      error: (err) => {
-        console.error('Error creando categoría:', err);
-        this.errorMessage = 'Error al crear la categoría. Intenta de nuevo.';
-        this.loading = false;
-      }
-    });
+    this.categoryService.createCategory({ nombre, descripcion })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (newCat) => {
+          this.categories = [newCat, ...this.categories];
+          this.newCategory = { nombre: '', descripcion: '' };
+          this.loading = false;
+        },
+        error: (err) => {
+          console.error('Error creando categoría:', err);
+          this.errorMessage = err.error?.message || 'Error al crear la categoría. Intenta de nuevo.';
+          this.loading = false;
+        }
+      });
   }
 
   startEdit(cat: Category) {
+    // Evitar múltiples ediciones simultáneas
+    if (this.editingId !== null) {
+      this.cancelEdit();
+    }
+    
     this.editingId = cat.id;
     this.editForm = {
       nombre: cat.nombre,
@@ -121,6 +138,7 @@ canDeleteCategory(category: Category): boolean {
 
   cancelEdit() {
     this.editingId = null;
+    this.editForm = { nombre: '', descripcion: '' };
   }
 
   saveEdit(cat: Category) {
@@ -132,41 +150,55 @@ canDeleteCategory(category: Category): boolean {
       return;
     }
 
+    // Verificar si realmente hubo cambios
+    if (nombre === cat.nombre && descripcion === cat.descripcion) {
+      this.cancelEdit();
+      return;
+    }
+
     this.loading = true;
     this.errorMessage = '';
 
-    this.categoryService.updateCategory(cat.id, { nombre, descripcion }).subscribe({
-      next: (updatedCat) => {
-        this.categories = this.categories.map(c =>
-          c.id === cat.id ? updatedCat : c
-        );
-        this.editingId = null;
-        this.loading = false;
-      },
-      error: (err) => {
-        console.error('Error actualizando categoría:', err);
-        this.errorMessage = 'Error al actualizar la categoría. Intenta de nuevo.';
-        this.loading = false;
-      }
-    });
+    this.categoryService.updateCategory(cat.id, { nombre, descripcion })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (updatedCat) => {
+          this.categories = this.categories.map(c =>
+            c.id === cat.id ? updatedCat : c
+          );
+          this.cancelEdit();
+          this.loading = false;
+        },
+        error: (err) => {
+          console.error('Error actualizando categoría:', err);
+          this.errorMessage = err.error?.message || 'Error al actualizar la categoría. Intenta de nuevo.';
+          this.loading = false;
+        }
+      });
   }
 
   deleteCategory(cat: Category) {
-    if (!confirm(`¿Eliminar categoría "${cat.nombre}"?`)) return;
+    if (!confirm(`¿Eliminar categoría "${cat.nombre}"?\n\nEsta acción no se puede deshacer.`)) return;
     
     this.loading = true;
     this.errorMessage = '';
 
-    this.categoryService.deleteCategory(cat.id).subscribe({
-      next: () => {
-        this.categories = this.categories.filter(c => c.id !== cat.id);
-        this.loading = false;
-      },
-      error: (err) => {
-        console.error('Error eliminando categoría:', err);
-        this.errorMessage = 'Error al eliminar la categoría. Intenta de nuevo.';
-        this.loading = false;
-      }
-    });
+    this.categoryService.deleteCategory(cat.id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.categories = this.categories.filter(c => c.id !== cat.id);
+          this.loading = false;
+        },
+        error: (err) => {
+          console.error('Error eliminando categoría:', err);
+          this.errorMessage = err.error?.message || 'Error al eliminar la categoría. Intenta de nuevo.';
+          this.loading = false;
+        }
+      });
   }
+
+  getCategoryColorClass(id: number): string {
+  const colors = ['color-0', 'color-1', 'color-2', 'color-3', 'color-4'];
+  return colors[id % colors.length]; }
 }

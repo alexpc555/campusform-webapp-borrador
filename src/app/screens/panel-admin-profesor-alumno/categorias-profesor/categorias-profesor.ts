@@ -172,8 +172,11 @@ canDeleteCategory(category: Category): boolean {
     });
   }
 
+  getCategoryColorClass(id: number): string {
+  const colors = ['color-0', 'color-1', 'color-2', 'color-3', 'color-4'];
+  return colors[id % colors.length];}
 
-  
+
 
 
 

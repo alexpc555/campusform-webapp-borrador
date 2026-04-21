@@ -1,61 +1,131 @@
-<nav class="navbar navbar-expand-lg navbar-glass sticky-top border-bottom">
-  <div class="container py-2 position-relative">
-    <a class="navbar-brand d-flex align-items-center gap-2">
-      <span class="brand-icon">
-        <i class="bi bi-mortarboard-fill"></i>
-      </span>
-      <span class="brand-name">CampusForum</span>
-    </a>
+<div class="comentarios-root">
+  <!-- Navbar -->
+  <nav class="navbar-glass">
+    <div class="navbar-container">
+      <a class="brand-wrapper">
+        <div class="brand-icon">
+          <i class="bi bi-mortarboard-fill"></i>
+        </div>
+        <span class="brand-name">CampusForum</span>
+      </a>
 
-    <div class="ms-auto d-flex align-items-center gap-2">
-      <button class="btn btn-outline-danger" (click)="volver()">
-        <i class="bi bi-arrow-left me-1"></i>
-        Volver
-      </button>
+      <div class="navbar-actions">
+        <span class="page-badge">
+          <i class="bi bi-chat-dots-fill"></i>
+          Mis Comentarios
+        </span>
+
+        <button class="btn-back" (click)="volver()">
+          <i class="bi bi-arrow-left"></i>
+          <span>Volver</span>
+        </button>
+      </div>
     </div>
-  </div>
-</nav>
+  </nav>
 
-<div class="feed-wrapper">
-  <div class="feed-header">
-    <div>
-      <h2>Historial de Comentarios</h2>
-      <p>Revisa y administra tus comentarios en la plataforma</p>
-    </div>
-  </div>
-
-  <div class="posts-container">
-
-    <div *ngIf="loading" class="text-center py-5">
-      <p>Cargando comentarios...</p>
-    </div>
-
-    <div *ngIf="errorMessage" class="alert alert-danger">
-      {{ errorMessage }}
-    </div>
-
-    <div class="post-card" *ngFor="let comment of comments">
-      <div class="post-header">
-        <div class="avatar">AL</div>
-
-        <div>
-          <h4>Comentario en post #{{ comment.post }}</h4>
-          <p>{{ comment.autor_nombre }} • {{ comment.fecha_creacion | date:'short' }}</p>
+  <!-- Header Section -->
+  <section class="header-section">
+    <div class="container">
+      <div class="header-content fade-in-up">
+        <div class="header-icon">
+          <i class="bi bi-chat-dots-fill"></i>
+        </div>
+        <div class="header-text">
+          <h1 class="header-title">Historial de Comentarios</h1>
+          <p class="header-subtitle">Revisa y administra tus comentarios en la plataforma</p>
         </div>
       </div>
+    </div>
+  </section>
 
-      <p class="post-content mt-3">
-        "{{ comment.contenido }}"
-      </p>
+  <!-- Main Content -->
+  <section class="content-section">
+    <div class="container">
+      <!-- Loading State -->
+      <div class="loading-state fade-in-up" *ngIf="loading">
+        <div class="loading-spinner">
+          <div class="spinner-blue"></div>
+        </div>
+        <p class="loading-text">Cargando tus comentarios...</p>
+      </div>
 
-      <div class="action-links">
-        <a (click)="verPostOriginal(comment.post)" style="cursor:pointer;">Ver Post Original</a>
+      <!-- Error Message -->
+      <div class="alert-error fade-in-up" *ngIf="errorMessage && !loading">
+        <i class="bi bi-exclamation-circle-fill"></i>
+        <span>{{ errorMessage }}</span>
+        <button class="retry-btn" (click)="loadComments()">
+          <i class="bi bi-arrow-repeat"></i>
+          Reintentar
+        </button>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state fade-in-up" *ngIf="!loading && !errorMessage && comments.length === 0">
+        <div class="empty-icon-wrapper">
+          <i class="bi bi-chat-square-text"></i>
+        </div>
+        <h3 class="empty-title">Aún no has hecho comentarios</h3>
+        <p class="empty-text">Participa en las conversaciones del foro para ver tu historial aquí</p>
+        <button class="btn-create-secondary" routerLink="/dashboard">
+          <i class="bi bi-chat-dots"></i>
+          Ir al Foro
+        </button>
+      </div>
+
+      <!-- Comments Grid -->
+      <div class="comments-grid fade-in-up" *ngIf="!loading && !errorMessage && comments.length > 0">
+        <div class="stats-bar">
+          <div class="stats-count">
+            <i class="bi bi-chat-dots"></i>
+            <span>{{ comments.length }} comentario{{ comments.length !== 1 ? 's' : '' }}</span>
+          </div>
+        </div>
+
+        <div class="comment-card" *ngFor="let comment of comments">
+          <div class="comment-header">
+            <div class="comment-avatar">
+              {{ getInitials(comment.autor_nombre || 'Alumno') }}
+            </div>
+            <div class="comment-header-info">
+              <div class="comment-title-row">
+                <h3 class="comment-title">Comentario en publicación #{{ comment.post }}</h3>
+                <span class="comment-badge">
+                  <i class="bi bi-chat"></i>
+                  Comentario
+                </span>
+              </div>
+              <div class="comment-meta">
+                <span class="meta-item">
+                  <i class="bi bi-person-circle"></i>
+                  {{ comment.autor_nombre || 'Alumno' }}
+                </span>
+                <span class="meta-item">
+                  <i class="bi bi-calendar"></i>
+                  {{ comment.fecha_creacion | date:'dd/MM/yyyy' }}
+                </span>
+                <span class="meta-item">
+                  <i class="bi bi-clock"></i>
+                  {{ comment.fecha_creacion | date:'HH:mm' }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="comment-body">
+            <div class="comment-content-wrapper">
+              <i class="bi bi-quote quote-icon"></i>
+              <p class="comment-content">{{ comment.contenido }}</p>
+            </div>
+          </div>
+
+          <div class="comment-footer">
+            <button class="action-btn" (click)="verPostOriginal(comment.post)">
+              <i class="bi bi-box-arrow-up-right"></i>
+              <span>Ver publicación original</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
-
-    <div *ngIf="!loading && comments.length === 0" class="text-center py-5">
-      <p>Aún no has hecho ningún comentario.</p>
-    </div>
-
-  </div>
+  </section>
 </div>

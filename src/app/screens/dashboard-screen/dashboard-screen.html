@@ -1,177 +1,206 @@
-<div class="dashboard-root landing-root">
+<div class="dashboard-root">
   <!-- TOPBAR -->
-  <mat-toolbar class="navbar-glass sticky-top border-bottom">
-    <button mat-icon-button class="hide-desktop" (click)="toggleSidenav()">
-      <mat-icon>menu</mat-icon>
-    </button>
-
-    <div class="brand-icon" (click)="goToMyPanel()" style="cursor: pointer;">
-      <mat-icon>school</mat-icon>
-    </div>
-
-    <span class="brand-name" style="margin-left: 10px; cursor: pointer;" (click)="goToMyPanel()">CampusForum</span>
-
-    <span style="flex: 1 1 auto;"></span>
-
-    <span class="pill badge-soft" style="display:inline-flex; align-items:center; gap:8px;">
-      <mat-icon style="font-size:18px; width:18px; height:18px;">person</mat-icon>
-      {{ userType }}
-    </span>
-
-    <button mat-icon-button (click)="goToMyPanel()" title="Ir a mi panel">
-      <mat-icon>dashboard</mat-icon>
-    </button>
-
-    <button mat-icon-button (click)="logout()" title="Cerrar sesión">
-      <mat-icon>logout</mat-icon>
-    </button>
-  </mat-toolbar>
-
-  <!-- LAYOUT -->
-  <mat-sidenav-container class="container">
-    <!-- SIDEBAR -->
-    <mat-sidenav #sidenav class="sidebar" [mode]="isMobile ? 'over' : 'side'" [opened]="!isMobile">
-      <button mat-button class="nav-btn" [class.active]="activeSection === 'Inicio'" (click)="goToSection('Inicio')">
-        <mat-icon>home</mat-icon>
-        Inicio
-      </button>
-
-      <button mat-button class="nav-btn" [class.active]="activeSection === 'Mis Posts'" (click)="goToSection('Mis Posts')">
-        <mat-icon>chat</mat-icon>
-        Mis Posts
-      </button>
-
-      <button mat-button class="nav-btn" [class.active]="activeSection === 'Populares'" (click)="goToSection('Populares')">
-        <mat-icon>trending_up</mat-icon>
-        Populares
-      </button>
-
-      <button mat-button class="nav-btn" [class.active]="activeSection === 'Guardados'" (click)="goToSection('Guardados')">
-        <mat-icon>bookmark</mat-icon>
-        Guardados
-      </button>
-
-      <!-- CATEGORÍAS -->
-      <div class="sidebar-cats">
-        <div class="sidebar-cats-title">CATEGORÍAS</div>
-
-        <button mat-button class="nav-btn" [class.active]="activeCategory === 'Todas'" (click)="goToCategory('Todas')">
-          Todas
+  <nav class="navbar-glass">
+    <div class="navbar-container">
+      <div class="navbar-left">
+        <button class="menu-toggle hide-desktop" (click)="toggleSidenav()">
+          <i class="bi bi-list"></i>
         </button>
 
-        <button *ngFor="let cat of categorias" mat-button class="nav-btn" [class.active]="activeCategory === cat.nombre" (click)="goToCategory(cat.nombre)">
-          {{ cat.nombre }}
+        <a class="brand-wrapper" (click)="goToMyPanel()">
+          <div class="brand-icon">
+            <i class="bi bi-mortarboard-fill"></i>
+          </div>
+          <span class="brand-name">CampusForum</span>
+        </a>
+      </div>
+
+      <div class="navbar-right">
+        <span class="user-badge">
+          <i class="bi bi-person-circle"></i>
+          {{ userType }}
+        </span>
+
+        <button class="btn-icon" (click)="goToMyPanel()" title="Ir a mi panel">
+          <i class="bi bi-grid-3x3-gap-fill"></i>
+        </button>
+
+        <button class="btn-icon btn-logout" (click)="logout()" title="Cerrar sesión">
+          <i class="bi bi-box-arrow-right"></i>
         </button>
       </div>
-    </mat-sidenav>
+    </div>
+  </nav>
+
+  <!-- LAYOUT -->
+  <div class="layout-container">
+    <!-- SIDEBAR -->
+    <aside class="sidebar" [class.mobile-open]="isMobile && sidenav?.opened" [class.mobile-closed]="isMobile && !sidenav?.opened">
+      <div class="sidebar-content">
+        <button class="nav-item" [class.active]="activeSection === 'Inicio'" (click)="goToSection('Inicio')">
+          <i class="bi bi-house-door-fill"></i>
+          <span>Inicio</span>
+        </button>
+
+        <button class="nav-item" [class.active]="activeSection === 'Mis Posts'" (click)="goToSection('Mis Posts')">
+          <i class="bi bi-file-post-fill"></i>
+          <span>Mis Posts</span>
+        </button>
+
+
+        <!-- CATEGORÍAS -->
+        <div class="sidebar-section">
+          <div class="section-label">CATEGORÍAS</div>
+
+          <button class="nav-item category-item" [class.active]="activeCategory === 'Todas'" (click)="goToCategory('Todas')">
+            <i class="bi bi-grid-fill"></i>
+            <span>Todas</span>
+          </button>
+
+          <button 
+            *ngFor="let cat of categorias" 
+            class="nav-item category-item" 
+            [class.active]="activeCategory === cat.nombre" 
+            (click)="goToCategory(cat.nombre)"
+          >
+            <i class="bi bi-folder-fill"></i>
+            <span>{{ cat.nombre }}</span>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- OVERLAY para móvil -->
+    <div class="sidebar-overlay" *ngIf="isMobile && sidenav?.opened" (click)="toggleSidenav()"></div>
 
     <!-- CONTENT -->
-    <mat-sidenav-content class="content">
-      <div class="page-wrap">
+    <main class="main-content" [class.sidebar-open]="!isMobile">
+      <div class="content-container">
         <!-- BREADCRUMB -->
-        <div class="breadcrumb">
-          <span (click)="goToSection('Inicio')" style="cursor: pointer;">Inicio</span>
-          <span class="dot">›</span>
-          Dashboard
-          <span class="dot">›</span>
-          {{ activeCategory || 'Todas' }}
+        <div class="breadcrumb fade-in-up">
+          <span class="breadcrumb-link" (click)="goToSection('Inicio')">Inicio</span>
+          <i class="bi bi-chevron-right"></i>
+          <span>Dashboard</span>
+          <i class="bi bi-chevron-right"></i>
+          <span class="breadcrumb-current">{{ activeCategory || 'Todas' }}</span>
         </div>
 
         <!-- HEADER -->
-        <div class="content-header">
-          <div class="content-title">
-            <h1 class="section-title">Feed de Publicaciones</h1>
-            <p class="section-subtitle">{{ filteredPosts.length }} publicaciones encontradas</p>
+        <div class="page-header fade-in-up delay-1">
+          <div class="header-content">
+            <div class="header-icon">
+              <i class="bi bi-chat-square-text-fill"></i>
+            </div>
+            <div class="header-text">
+              <h1 class="page-title">Feed de Publicaciones</h1>
+              <p class="page-subtitle">{{ filteredPosts.length }} publicaciones encontradas</p>
+            </div>
           </div>
         </div>
 
         <!-- SEARCH + ORDER -->
-        <div class="glass-card search-card">
-          <div class="search-row">
-            <mat-form-field appearance="outline" class="search-field">
-              <mat-label>Buscar publicaciones...</mat-label>
-              <mat-icon matPrefix>search</mat-icon>
-              <input matInput [(ngModel)]="searchQuery" (ngModelChange)="onSearchChange()" />
-            </mat-form-field>
+        <div class="filters-card fade-in-up delay-1">
+          <div class="filters-row">
+            <div class="search-wrapper">
+              <i class="bi bi-search search-icon"></i>
+              <input
+                type="text"
+                class="search-input"
+                placeholder="Buscar publicaciones..."
+                [(ngModel)]="searchQuery"
+                (ngModelChange)="onSearchChange()"
+              />
+            </div>
 
-            <mat-form-field appearance="outline" class="sort-field">
-              <mat-label>Ordenar por</mat-label>
-              <mat-select [(ngModel)]="sortBy" (ngModelChange)="onSortChange()">
-                <mat-option value="recent">Más recientes</mat-option>
-                <mat-option value="popular">Más populares</mat-option>
-                <mat-option value="comments">Más comentados</mat-option>
-              </mat-select>
-            </mat-form-field>
+            <div class="sort-wrapper">
+              <i class="bi bi-sort-down sort-icon"></i>
+              <select class="sort-select" [(ngModel)]="sortBy" (ngModelChange)="onSortChange()">
+                <option value="recent">Más recientes</option>
+                <option value="popular">Más populares</option>
+                <option value="comments">Más comentados</option>
+              </select>
+            </div>
           </div>
         </div>
 
-        <!-- POSTS -->
-        <div *ngIf="loading" class="text-center py-5">
-          <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Cargando...</span>
+        <!-- LOADING -->
+        <div *ngIf="loading" class="loading-state fade-in-up delay-1">
+          <div class="loading-spinner">
+            <div class="spinner-blue"></div>
           </div>
-          <p class="text-muted mt-2">Cargando publicaciones...</p>
+          <p class="loading-text">Cargando publicaciones...</p>
         </div>
 
-        <div *ngIf="!loading && filteredPosts.length === 0" class="glass-card empty-state empty-card">
-          <div class="empty-icon">📭</div>
+        <!-- EMPTY STATE -->
+        <div *ngIf="!loading && filteredPosts.length === 0" class="empty-state fade-in-up delay-1">
+          <div class="empty-icon-wrapper">
+            <i class="bi bi-inbox"></i>
+          </div>
           <h3 class="empty-title">No hay publicaciones</h3>
           <p class="empty-text">No se encontraron publicaciones con los filtros seleccionados.</p>
         </div>
 
-        <div *ngIf="!loading && filteredPosts.length > 0" class="posts-grid">
-          <div *ngFor="let post of filteredPosts" class="post-card glass-card">
+        <!-- POSTS GRID -->
+        <div *ngIf="!loading && filteredPosts.length > 0" class="posts-grid fade-in-up delay-1">
+          <div *ngFor="let post of filteredPosts" class="post-card">
             <div class="post-header">
               <div class="post-avatar">
-                <mat-icon>person</mat-icon>
+                {{ getInitials(post.autor_nombre) }}
               </div>
-              <div class="post-info">
+              <div class="post-header-info">
                 <h3 class="post-title">{{ post.titulo }}</h3>
                 <div class="post-meta">
-                  <span class="post-author">
-                    <mat-icon>person_outline</mat-icon>
-                    {{ post.autor_nombre }}
+                  <span class="meta-item">
+                    <i class="bi bi-person-circle"></i>
+                    {{ post.autor_nombre || 'Anónimo' }}
                   </span>
-                  <span class="post-category">
-                    <mat-icon>folder</mat-icon>
+                  <span class="meta-item">
+                    <i class="bi bi-folder-fill"></i>
                     {{ getCategoriaNombre(post.categoria) }}
                   </span>
-                  <span class="post-date">
-                    <mat-icon>schedule</mat-icon>
+                  <span class="meta-item">
+                    <i class="bi bi-clock"></i>
                     {{ formatDate(post.fecha_creacion) }}
                   </span>
-                  <span class="post-views">
-                    <mat-icon>visibility</mat-icon>
+                  <span class="meta-item">
+                    <i class="bi bi-eye"></i>
                     {{ post.vistas }} vistas
                   </span>
                 </div>
               </div>
             </div>
 
-            <div class="post-content">
-              <p>{{ post.contenido | slice:0:300 }}{{ post.contenido.length > 300 ? '...' : '' }}</p>
+            <div class="post-body">
+              <p class="post-content">{{ truncateContent(post.contenido, 350) }}</p>
             </div>
 
             <div class="post-tags" *ngIf="post.etiquetas">
-              <span *ngFor="let tag of post.etiquetas.split(',')" class="tag">
-                <mat-icon>tag</mat-icon>
-                {{ tag.trim() }}
+              <span *ngFor="let tag of getTagsArray(post.etiquetas).slice(0, 4)" class="tag-item">
+                #{{ tag }}
               </span>
             </div>
 
-            <div class="post-actions">
-              <button class="action-btn" (click)="openCommentsModal(post)">
-                <mat-icon>chat_bubble_outline</mat-icon>
-                <span>Comentar</span>
-              </button>
-              <button class="action-btn report-btn" (click)="openReportModal(post)">
-                <mat-icon>flag</mat-icon>
-                <span>Reportar</span>
-              </button>
+            <div class="post-footer">
+              <div class="post-stats">
+                <span class="stat-item">
+                  <i class="bi bi-chat-dots"></i>
+                  {{ post.comentarios_count || 0 }} comentarios
+                </span>
+              </div>
+              <div class="post-actions">
+                <button class="action-btn" (click)="openCommentsModal(post)">
+                  <i class="bi bi-chat-dots-fill"></i>
+                  <span>Comentar</span>
+                </button>
+                <button class="action-btn report-btn" (click)="openReportModal(post)">
+                  <i class="bi bi-flag-fill"></i>
+                  <span>Reportar</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </mat-sidenav-content>
-  </mat-sidenav-container>
+    </main>
+  </div>
 </div>

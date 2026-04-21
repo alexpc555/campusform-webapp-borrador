@@ -17,6 +17,8 @@ type Role = 'student' | 'teacher' | 'admin';
 export class Registro implements OnInit {
   submitting = false;
   form!: FormGroup;
+  registerError: string = '';
+  registerSuccess: boolean = false;
 
   // Mapa de dominios para mostrar en mensajes de error
   domainMap = {
@@ -140,6 +142,38 @@ export class Registro implements OnInit {
     return errors;
   }
 
+  // Calcular fortaleza de la contraseña (0-100)
+  getPasswordStrength(): number {
+    const password = this.password?.value || '';
+    if (!password) return 0;
+    
+    let strength = 0;
+    
+    // Longitud
+    if (password.length >= 8) strength += 25;
+    if (password.length >= 12) strength += 10;
+    
+    // Mayúsculas
+    if (/[A-Z]/.test(password)) strength += 20;
+    
+    // Números
+    if (/[0-9]/.test(password)) strength += 20;
+    
+    // Caracteres especiales
+    if (/[^A-Za-z0-9]/.test(password)) strength += 25;
+    
+    return Math.min(strength, 100);
+  }
+
+  // Obtener texto de fortaleza
+  getPasswordStrengthText(): string {
+    const strength = this.getPasswordStrength();
+    if (strength === 0) return '';
+    if (strength < 40) return 'Débil';
+    if (strength < 70) return 'Media';
+    return 'Fuerte';
+  }
+
   submit() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -147,25 +181,72 @@ export class Registro implements OnInit {
     }
 
     this.submitting = true;
+    this.registerError = '';
+    this.registerSuccess = false;
 
     const payload = {
       name: (this.form.value.name || '').trim(),
-      email: (this.form.value.email || '').trim(),
+      email: (this.form.value.email || '').trim().toLowerCase(),
       password: (this.form.value.password || '').trim(),
       role: this.form.value.role as Role,
     };
 
-    console.log('Registrando:', payload);
+    console.log('📤 Enviando registro:', payload);
 
     this.auth.register(payload).subscribe({
-      next: () => {
+      next: (response) => {
+        console.log('✅ Registro exitoso:', response);
         this.submitting = false;
-        // REDIRIGIR A LA PÁGINA DE LOGIN
-        this.router.navigate(['/login']);
+        this.registerSuccess = true;
+        
+        // Redirigir después de 2 segundos
+        setTimeout(() => {
+          this.router.navigate(['/login']);
+        }, 2000);
       },
       error: (err) => {
         this.submitting = false;
-        console.error('Error register:', err?.error || err);
+        console.error('❌ Error en registro:', err);
+        
+        if (err.status === 400) {
+          const errorData = err.error;
+          
+          if (errorData.email) {
+            if (Array.isArray(errorData.email)) {
+              this.registerError = errorData.email[0];
+            } else {
+              this.registerError = 'El correo electrónico ya está registrado.';
+            }
+          } else if (errorData.password) {
+            if (Array.isArray(errorData.password)) {
+              this.registerError = errorData.password[0];
+            } else {
+              this.registerError = 'La contraseña no cumple con los requisitos de seguridad.';
+            }
+          } else if (errorData.name) {
+            if (Array.isArray(errorData.name)) {
+              this.registerError = errorData.name[0];
+            } else {
+              this.registerError = 'El nombre contiene caracteres no permitidos.';
+            }
+          } else if (errorData.role) {
+            if (Array.isArray(errorData.role)) {
+              this.registerError = errorData.role[0];
+            } else {
+              this.registerError = 'El rol seleccionado no es válido.';
+            }
+          } else {
+            this.registerError = 'Error en los datos del formulario. Verifica la información.';
+          }
+        } else if (err.status === 401) {
+          this.registerError = 'Error de autenticación. Contacta al administrador.';
+        } else if (err.status === 500) {
+          this.registerError = 'Error en el servidor. Intenta de nuevo más tarde.';
+        } else if (err.status === 0) {
+          this.registerError = 'No se pudo conectar con el servidor. Verifica que el backend esté corriendo en http://localhost:8000';
+        } else {
+          this.registerError = 'Error al crear la cuenta. Intenta de nuevo.';
+        }
       }
     });
   }

@@ -200,6 +200,10 @@ export class PostAlumno implements OnInit {
     }
   }
 
+  getEtiquetasArray(etiquetas: string | undefined): string[] {
+  if (!etiquetas) return [];
+  return etiquetas.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);}
+
   volver() {
     this.router.navigate(['/student-panel']);
   }

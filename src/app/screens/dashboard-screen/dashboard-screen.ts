@@ -298,4 +298,17 @@ export class DashboardScreen implements OnInit {
     alert('Funcionalidad de guardados en desarrollo');
     this.loading = false;
   }
+
+  getInitials(name: string | undefined): string {
+  if (!name) return 'U';
+  return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);}
+
+  truncateContent(content: string, maxLength: number): string {
+  if (!content) return '';
+  if (content.length <= maxLength) return content;
+  return content.substring(0, maxLength) + '...';}
+
+  getTagsArray(etiquetas: string | undefined): string[] {
+  if (!etiquetas) return [];
+  return etiquetas.split(',').map(t => t.trim()).filter(t => t.length > 0);}
 }

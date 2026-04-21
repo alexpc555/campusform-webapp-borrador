@@ -1,196 +1,257 @@
-<nav class="navbar navbar-expand-lg navbar-glass sticky-top border-bottom">
-  <div class="container py-2 position-relative">
+<div class="posts-root">
+  <!-- Navbar -->
+  <nav class="navbar-glass">
+    <div class="navbar-container">
+      <a class="brand-wrapper">
+        <div class="brand-icon">
+          <i class="bi bi-mortarboard-fill"></i>
+        </div>
+        <span class="brand-name">CampusForum</span>
+      </a>
 
-    <a class="navbar-brand d-flex align-items-center gap-2">
-      <span class="brand-icon">
-        <i class="bi bi-mortarboard-fill"></i>
-      </span>
-      <span class="brand-name">CampusForum</span>
-    </a>
+      <div class="navbar-actions">
+        <span class="page-badge">
+          <i class="bi bi-file-post-fill"></i>
+          Mis Publicaciones
+        </span>
 
-    <div class="ms-auto d-flex align-items-center gap-2">
-
-      <button class="btn btn-outline-danger" (click)="volver()">
-        <i class="bi bi-arrow-left me-1"></i>
-        Volver
-      </button>
-
-    </div>
-
-  </div>
-</nav>
-
-
-<div class="feed-wrapper">
-
-  <div class="feed-header">
-
-    <div>
-      <h2>{{ editando ? 'Editar Publicación' : 'Nueva Publicación' }}</h2>
-<p>{{ editando ? 'Actualiza tu publicación académica' : 'Comparte tu conocimiento con la comunidad académica' }}</p>
-    </div>
-
-    <button class="btn-publicar" (click)="abrirModal()">
-      + Nueva Publicación
-    </button>
-
-  </div>
-
-
-  <div class="posts-container">
-
-  <div *ngIf="cargandoPosts" class="text-center py-4">
-    <div class="spinner-border text-primary mb-2" role="status">
-      <span class="visually-hidden">Cargando...</span>
-    </div>
-    <p>Cargando publicaciones...</p>
-  </div>
-
-  <div *ngIf="!cargandoPosts && posts.length === 0" class="text-center py-4">
-    <p>No has creado publicaciones todavía.</p>
-  </div>
-
-  <div class="post-card" *ngFor="let post of posts">
-
-    <div class="post-header">
-      <div class="avatar">
-        {{ getInitials(usuarioActual?.name || 'Profesor') }}
-      </div>
-
-      <div>
-        <h4>{{ post.titulo }}</h4>
-        <p>{{ post.autor_nombre || 'Profesor' }} • {{ post.fecha_creacion | date:'short' }}</p>
-      </div>
-    </div>
-
-    <p class="post-content">
-      {{ post.contenido }}
-    </p>
-
-    <div class="post-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
-      <span class="tag">
-        {{ getNombreCategoria(post.categoria) }}
-      </span>
-
-      <div class="d-flex gap-2">
-        <button class="btn btn-sm btn-outline-primary" (click)="editarPost(post)">
-          <i class="bi bi-pencil-square me-1"></i>
-          Editar
-        </button>
-
-        <button class="btn btn-sm btn-outline-danger" (click)="eliminarPost(post)">
-          <i class="bi bi-trash3 me-1"></i>
-          Eliminar
+        <button class="btn-back" (click)="volver()">
+          <i class="bi bi-arrow-left"></i>
+          <span>Volver</span>
         </button>
       </div>
     </div>
+  </nav>
 
-  </div>
+  <!-- Header Section -->
+  <section class="header-section">
+    <div class="container">
+      <div class="header-content fade-in-up">
+        <div class="header-icon">
+          <i class="bi bi-file-post-fill"></i>
+        </div>
+        <div class="header-text">
+          <h1 class="header-title">Gestión de Publicaciones</h1>
+          <p class="header-subtitle">Crea, edita y administra tus publicaciones académicas</p>
+        </div>
+        <button class="btn-create" (click)="abrirModal()">
+          <i class="bi bi-plus-lg"></i>
+          <span>Nueva Publicación</span>
+        </button>
+      </div>
+    </div>
+  </section>
 
+  <!-- Main Content -->
+  <section class="content-section">
+    <div class="container">
+      <!-- Loading State -->
+      <div class="loading-state fade-in-up" *ngIf="cargandoPosts">
+        <div class="loading-spinner">
+          <div class="spinner-blue"></div>
+        </div>
+        <p class="loading-text">Cargando publicaciones...</p>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state fade-in-up" *ngIf="!cargandoPosts && posts.length === 0">
+        <div class="empty-icon-wrapper">
+          <i class="bi bi-journal-text"></i>
+        </div>
+        <h3 class="empty-title">No tienes publicaciones</h3>
+        <p class="empty-text">Comienza creando tu primera publicación académica</p>
+        <button class="btn-create-secondary" (click)="abrirModal()">
+          <i class="bi bi-plus-lg"></i>
+          Crear Publicación
+        </button>
+      </div>
+
+      <!-- Posts Grid -->
+      <div class="posts-grid fade-in-up" *ngIf="!cargandoPosts && posts.length > 0">
+        <div class="post-card" *ngFor="let post of posts">
+          <div class="post-header">
+            <div class="post-avatar">
+              {{ getInitials(usuarioActual?.name || 'Profesor') }}
+            </div>
+            <div class="post-header-info">
+              <h3 class="post-title">{{ post.titulo }}</h3>
+              <div class="post-meta">
+                <span class="meta-item">
+                  <i class="bi bi-person-circle"></i>
+                  {{ post.autor_nombre || 'Profesor' }}
+                </span>
+                <span class="meta-item">
+                  <i class="bi bi-calendar"></i>
+                  {{ post.fecha_creacion | date:'dd/MM/yyyy HH:mm' }}
+                </span>
+                <span class="meta-item">
+                  <i class="bi bi-eye"></i>
+                  {{ post.vistas || 0 }} vistas
+                </span>
+                <span class="meta-item" *ngIf="post.comentarios_count">
+                  <i class="bi bi-chat-dots"></i>
+                  {{ post.comentarios_count }} comentarios
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="post-body">
+            <p class="post-content">{{ post.contenido }}</p>
+          </div>
+
+          <div class="post-footer">
+            <div class="post-tags">
+              <span class="category-tag">
+                <i class="bi bi-folder-fill"></i>
+                {{ getNombreCategoria(post.categoria) }}
+              </span>
+              <span *ngFor="let tag of getEtiquetasArray(post.etiquetas).slice(0, 3)" class="tag-item">
+                #{{ tag }}
+              </span>
+            </div>
+            <div class="post-actions">
+              <button class="action-btn edit-btn" (click)="editarPost(post)">
+                <i class="bi bi-pencil-fill"></i>
+                <span>Editar</span>
+              </button>
+              <button class="action-btn delete-btn" (click)="eliminarPost(post)">
+                <i class="bi bi-trash3-fill"></i>
+                <span>Eliminar</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 </div>
 
-
 <!-- MODAL -->
-
-<div class="modal" *ngIf="modalAbierto">
-
-  <div class="modal-content">
-
+<div class="modal-overlay" *ngIf="modalAbierto" (click)="cerrarModal()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
     <div class="modal-header">
+      <div class="modal-title-wrapper">
+        <div class="modal-icon">
+          <i class="bi" [class]="editando ? 'bi-pencil-fill' : 'bi-plus-lg'"></i>
+        </div>
+        <div class="modal-title-text">
+          <h2>{{ editando ? 'Editar Publicación' : 'Nueva Publicación' }}</h2>
+          <p>{{ editando ? 'Actualiza tu publicación académica' : 'Comparte tu conocimiento con la comunidad' }}</p>
+        </div>
+      </div>
+      <button class="modal-close" (click)="cerrarModal()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
 
-      <div>
-        <h2>Nueva Publicación</h2>
-        <p>Comparte tu conocimiento con la comunidad académica</p>
+    <div class="modal-body">
+      <!-- Título -->
+      <div class="form-group">
+        <label class="form-label">
+          <i class="bi bi-type"></i>
+          Título <span class="required">*</span>
+        </label>
+        <div class="input-wrapper">
+          <input
+            type="text"
+            class="form-input"
+            [class.error]="error && !titulo.trim()"
+            placeholder="Ej: Pregunta sobre Cálculo Diferencial"
+            maxlength="150"
+            [(ngModel)]="titulo"
+          />
+          <span class="char-counter" [class.limit]="titulo.length >= 150">
+            {{ titulo.length }}/150
+          </span>
+        </div>
       </div>
 
-      <button class="close-btn" (click)="cerrarModal()">✕</button>
+      <!-- Categoría -->
+      <div class="form-group">
+        <label class="form-label">
+          <i class="bi bi-folder"></i>
+          Categoría <span class="required">*</span>
+        </label>
+        <div class="select-wrapper">
+          <i class="bi bi-chevron-down select-icon"></i>
+          <select
+            class="form-select"
+            [class.error]="error && !categoriaId"
+            [(ngModel)]="categoriaId"
+            [disabled]="loading"
+          >
+            <option [ngValue]="null">Selecciona una categoría</option>
+            <option *ngFor="let cat of categorias" [ngValue]="cat.id">
+              {{ cat.nombre }}
+            </option>
+          </select>
+        </div>
+      </div>
 
+      <!-- Contenido -->
+      <div class="form-group">
+        <label class="form-label">
+          <i class="bi bi-pencil"></i>
+          Contenido <span class="required">*</span>
+        </label>
+        <div class="textarea-wrapper">
+          <textarea
+            class="form-textarea"
+            [class.error]="error && !contenido.trim()"
+            placeholder="Escribe el contenido de tu publicación..."
+            maxlength="5000"
+            [(ngModel)]="contenido"
+          ></textarea>
+          <span class="char-counter" [class.limit]="contenido.length >= 5000">
+            {{ contenido.length }}/5000
+          </span>
+        </div>
+      </div>
+
+      <!-- Etiquetas -->
+      <div class="form-group">
+        <label class="form-label">
+          <i class="bi bi-tags"></i>
+          Etiquetas <span class="optional">(opcional)</span>
+        </label>
+        <div class="input-wrapper">
+          <i class="bi bi-tag input-icon"></i>
+          <input
+            type="text"
+            class="form-input"
+            placeholder="Ej: matemáticas, cálculo, ayuda"
+            [(ngModel)]="etiquetas"
+          />
+        </div>
+        <p class="field-hint">
+          <i class="bi bi-info-circle"></i>
+          Separa las etiquetas con comas
+        </p>
+      </div>
+
+      <!-- Error Message -->
+      <div class="alert-error" *ngIf="error">
+        <i class="bi bi-exclamation-circle-fill"></i>
+        <span>{{ error }}</span>
+      </div>
     </div>
 
-
-    <!-- TITULO -->
-
-    <div class="form-group">
-
-      <input
-        type="text"
-        placeholder="Título **"
-        maxlength="150"
-        [(ngModel)]="titulo"
-      >
-
-      <span class="counter">
-        {{titulo.length}}/150
-      </span>
-
-    </div>
-
-
-    <!-- CATEGORIA -->
-
-    <div class="form-group">
-
-<label for="categoria">Categoría</label>
-
-<select class="form-select"
-        [(ngModel)]="categoriaId"
-        [disabled]="loading">
-  <option [ngValue]="null">Selecciona una categoría</option>
-  <option *ngFor="let cat of categorias" [ngValue]="cat.id">
-    {{ cat.nombre }}
-  </option>
-</select>
-
-    </div>
-
-
-    <!-- CONTENIDO -->
-
-    <div class="form-group">
-
-      <textarea
-        placeholder="Contenido **"
-        maxlength="5000"
-        [(ngModel)]="contenido"
-      ></textarea>
-
-      <span class="counter">
-        {{contenido.length}}/5000
-      </span>
-
-    </div>
-
-
-    <!-- ETIQUETAS -->
-
-    <div class="form-group">
-
-      <input
-        type="text"
-        placeholder="Etiquetas (opcional)"
-        [(ngModel)]="etiquetas"
-      >
-
-    </div>
-
-
-    <p class="error" *ngIf="error">
-      {{error}}
-    </p>
-
-
-    <div class="modal-actions">
-
-      <button class="cancelar" (click)="cerrarModal()">
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="cerrarModal()" [disabled]="loading">
+        <i class="bi bi-x-lg"></i>
         Cancelar
       </button>
-
-      <button class="publicar" (click)="publicar()">
-        Publicar
+      <button class="btn-save" (click)="publicar()" [disabled]="loading">
+        <span *ngIf="!loading">
+          <i class="bi" [class]="editando ? 'bi-check-lg' : 'bi-plus-lg'"></i>
+          {{ editando ? 'Guardar Cambios' : 'Publicar' }}
+        </span>
+        <span *ngIf="loading">
+          <span class="spinner"></span>
+          {{ editando ? 'Guardando...' : 'Publicando...' }}
+        </span>
       </button>
-
     </div>
-
   </div>
-
 </div>

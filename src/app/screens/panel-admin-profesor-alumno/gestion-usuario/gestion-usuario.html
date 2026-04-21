@@ -1,229 +1,366 @@
-<div class="landing-root">
+<div class="gestion-root">
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-glass sticky-top border-bottom">
-    <div class="container py-2 position-relative">
-      <a class="navbar-brand d-flex align-items-center gap-2" routerLink="/admin">
-        <span class="brand-icon"><i class="bi bi-mortarboard-fill"></i></span>
+  <nav class="navbar-glass">
+    <div class="navbar-container">
+      <a class="brand-wrapper" routerLink="/admin">
+        <div class="brand-icon">
+          <i class="bi bi-mortarboard-fill"></i>
+        </div>
         <span class="brand-name">CampusForum</span>
       </a>
 
-      <div class="ms-auto d-flex align-items-center gap-2">
-        <span class="badge badge-soft d-none d-md-inline">Admin • Gestión de Usuarios</span>
-        <a class="btn btn-outline-primary" routerLink="/admin">Volver</a>
+      <div class="navbar-actions">
+        <span class="page-badge">
+          <i class="bi bi-people-fill"></i>
+          Gestión de Usuarios
+        </span>
+
+        <button class="btn-back" routerLink="/admin">
+          <i class="bi bi-arrow-left"></i>
+          <span>Volver</span>
+        </button>
       </div>
     </div>
   </nav>
 
-  <section class="container py-5">
-    <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 mb-4">
-      <div>
-        <h1 class="section-title mb-2">Gestión de Usuarios</h1>
-        <p class="section-subtitle mb-0">Visualiza, crea, edita y gestiona todos los usuarios del sistema</p>
-      </div>
-
-      <div class="d-flex flex-wrap gap-2 align-items-center">
-        <input
-          class="form-control form-control-sm search-input"
-          placeholder="Buscar por nombre o email..."
-          [(ngModel)]="search"
-        />
-
-        <select class="form-select form-select-sm w-auto" [(ngModel)]="roleFilter">
-          <option value="all">Todos los roles</option>
-          <option value="student">Estudiante</option>
-          <option value="teacher">Profesor</option>
-          <option value="admin">Administrador</option>
-        </select>
-
-        <button class="btn btn-primary btn-sm" (click)="openCreateModal()">
-          <i class="bi bi-plus-lg me-2"></i> Nuevo Usuario
-        </button>
+  <!-- Header Section -->
+  <section class="header-section">
+    <div class="container">
+      <div class="header-content fade-in-up">
+        <div class="header-icon">
+          <i class="bi bi-people-fill"></i>
+        </div>
+        <div class="header-text">
+          <h1 class="header-title">Gestión de Usuarios</h1>
+          <p class="header-subtitle">Visualiza, crea, edita y gestiona todos los usuarios del sistema</p>
+        </div>
       </div>
     </div>
-
-    <!-- Mensaje de error -->
-    <div class="alert alert-danger" *ngIf="errorMessage">
-      {{ errorMessage }}
-      <button class="btn btn-sm btn-outline-danger ms-3" (click)="loadUsers()">
-        Reintentar
-      </button>
-    </div>
-
-    <!-- Spinner de carga -->
-    <div class="text-center py-5" *ngIf="loading && users.length === 0">
-      <div class="spinner-border text-primary mb-3" role="status">
-        <span class="visually-hidden">Cargando...</span>
-      </div>
-      <p class="text-muted">Cargando usuarios...</p>
-    </div>
-
-    <!-- Tabla usuarios -->
-    <div class="glass-card p-3 p-md-4" *ngIf="!loading || users.length > 0">
-      <div class="table-responsive">
-        <table class="table table-wire align-middle mb-0">
-          <thead>
-             <tr>
-              <th>Usuario</th>
-              <th>Email</th>
-              <th>Rol</th>
-              <th class="text-end">Acciones</th>
-             </tr>
-          </thead>
-
-          <tbody>
-            <tr *ngFor="let u of filteredUsers">
-              <td class="fw-bold">{{ u.nombre }}</td>
-              <td class="text-muted">{{ u.correo }}</td>
-              <td>
-                <span class="badge" [ngClass]="getRoleBadgeClass(u.rol)">
-                  <i class="bi" [ngClass]="getRoleIcon(u.rol)"></i>
-                  <span class="ms-1">{{ getRoleName(u.rol) }}</span>
-                </span>
-              </td>
-              <td class="text-end">
-                <button class="btn btn-link text-decoration-none me-2" 
-                        (click)="editUser(u)" 
-                        title="Editar"
-                        [disabled]="loading">
-                  <i class="bi bi-pencil-square"></i>
-                </button>
-                <button class="btn btn-link text-decoration-none text-danger" 
-                        (click)="deleteUser(u)" 
-                        title="Eliminar"
-                        [disabled]="loading">
-                  <i class="bi bi-trash3"></i>
-                </button>
-              </td>
-            </tr>
-
-            <tr *ngIf="filteredUsers.length === 0 && !loading">
-              <td colspan="4" class="text-center text-muted py-4">
-                No hay usuarios con esos filtros.
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
   </section>
-</div>
 
-<!-- Modal para crear/editar usuario con validaciones -->
-<div class="modal fade" id="userModal" tabindex="-1" data-bs-backdrop="static">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content glass-card">
-      <div class="modal-header border-0">
-        <h5 class="modal-title feature-title">{{ modalTitle }}</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form #userForm="ngForm">
-          <!-- Nombre -->
-          <div class="mb-3">
-            <label class="form-label small text-muted">Nombre Completo *</label>
-            <input class="form-control" 
-                   [(ngModel)]="formUser.nombre" 
-                   name="nombre"
-                   required
-                   pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+"
-                   #nombre="ngModel"
-                   placeholder="Ej: Juan Pérez">
-            <div class="text-danger small mt-1" *ngIf="nombre.touched && nombre.invalid">
-              <span *ngIf="nombre.errors?.['required']">El nombre es requerido</span>
-              <span *ngIf="nombre.errors?.['pattern']">Solo se permiten letras y espacios</span>
-            </div>
-          </div>
+  <!-- Main Content -->
+  <section class="content-section">
+    <div class="container">
+      <!-- Filters Bar -->
+      <div class="filters-bar fade-in-up delay-1">
+        <div class="search-wrapper">
+          <i class="bi bi-search search-icon"></i>
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Buscar por nombre o email..."
+            [(ngModel)]="search"
+          />
+        </div>
 
-          <!-- Email -->
-          <div class="mb-3">
-            <label class="form-label small text-muted">Correo Electrónico *</label>
-            <input class="form-control" 
-                   type="email"
-                   [(ngModel)]="formUser.correo" 
-                   name="correo"
-                   required
-                   email
-                   #correo="ngModel"
-                   [placeholder]="getEmailPlaceholder()">
-            <div class="text-danger small mt-1" *ngIf="correo.touched && correo.invalid">
-              <span *ngIf="correo.errors?.['required']">El correo es requerido</span>
-              <span *ngIf="correo.errors?.['email']">Ingrese un correo válido</span>
-              <span *ngIf="correo.errors?.['invalidEmailForRole']">{{ getEmailErrorMessage() }}</span>
-            </div>
-          </div>
-
-          <!-- Rol -->
-          <div class="mb-3">
-            <label class="form-label small text-muted">Rol *</label>
-            <select class="form-select" [(ngModel)]="formUser.rol" name="rol" required (change)="onRoleChange()">
+        <div class="filters-actions">
+          <div class="role-filter-wrapper">
+            <i class="bi bi-funnel-fill filter-icon"></i>
+            <select class="role-select" [(ngModel)]="roleFilter">
+              <option value="all">Todos los roles</option>
               <option value="student">Estudiante</option>
               <option value="teacher">Profesor</option>
               <option value="admin">Administrador</option>
             </select>
           </div>
 
-          <!-- Contraseña (solo para creación) -->
-          <div class="mb-3" *ngIf="!editingUser">
-            <label class="form-label small text-muted">Contraseña *</label>
-            <input class="form-control" 
-                   type="password"
-                   [(ngModel)]="formUser.contrasena" 
-                   name="contrasena"
-                   required
-                   minlength="8"
-                   pattern="^(?=.*[A-Z])(?=.*\d).{8,}$"
-                   #contrasena="ngModel"
-                   placeholder="Mínimo 8 caracteres, una mayúscula y un número">
-            <div class="text-danger small mt-1" *ngIf="contrasena.touched && contrasena.invalid">
+          <button class="btn-create" (click)="openCreateModal()">
+            <i class="bi bi-plus-lg"></i>
+            <span>Nuevo Usuario</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Error Message -->
+      <div class="alert-error fade-in-up delay-1" *ngIf="errorMessage">
+        <i class="bi bi-exclamation-circle-fill"></i>
+        <span>{{ errorMessage }}</span>
+        <button class="retry-btn" (click)="loadUsers()">
+          <i class="bi bi-arrow-repeat"></i>
+          Reintentar
+        </button>
+      </div>
+
+      <!-- Loading State -->
+      <div class="loading-state fade-in-up delay-1" *ngIf="loading && users.length === 0">
+        <div class="loading-spinner">
+          <div class="spinner-blue"></div>
+        </div>
+        <p class="loading-text">Cargando usuarios...</p>
+      </div>
+
+      <!-- Users Table -->
+      <div class="table-card fade-in-up delay-1" *ngIf="!loading || users.length > 0">
+        <div class="table-responsive">
+          <table class="users-table">
+            <thead>
+              <tr>
+                <th>Usuario</th>
+                <th>Email</th>
+                <th>Rol</th>
+                <th class="text-end">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let u of filteredUsers" class="user-row">
+                <td>
+                  <div class="user-info">
+                    <div class="user-avatar" [class]="getRoleAvatarClass(u.rol)">
+                      {{ u.nombre.charAt(0).toUpperCase() }}
+                    </div>
+                    <span class="user-name">{{ u.nombre }}</span>
+                  </div>
+                </td>
+                <td>
+                  <span class="user-email">{{ u.correo }}</span>
+                </td>
+                <td>
+                  <span class="role-badge" [class]="getRoleBadgeClass(u.rol)">
+                    <i class="bi" [class]="getRoleIcon(u.rol)"></i>
+                    {{ getRoleName(u.rol) }}
+                  </span>
+                </td>
+                <td class="text-end">
+                  <div class="action-buttons">
+                    <button class="btn-edit" (click)="editUser(u)" [disabled]="loading" title="Editar">
+                      <i class="bi bi-pencil-fill"></i>
+                    </button>
+                    <button class="btn-delete" (click)="deleteUser(u)" [disabled]="loading" title="Eliminar">
+                      <i class="bi bi-trash3-fill"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <tr *ngIf="filteredUsers.length === 0 && !loading">
+                <td colspan="4">
+                  <div class="empty-state">
+                    <i class="bi bi-people"></i>
+                    <h4>No se encontraron usuarios</h4>
+                    <p>No hay usuarios que coincidan con los filtros aplicados</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="userModal" tabindex="-1" data-bs-backdrop="static" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-wrapper">
+          <div class="modal-icon">
+            <i class="bi" [class]="editingUser ? 'bi-pencil-fill' : 'bi-person-plus-fill'"></i>
+          </div>
+          <h5 class="modal-title">{{ modalTitle }}</h5>
+        </div>
+        <button type="button" class="modal-close" data-bs-dismiss="modal" aria-label="Close">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <form #userForm="ngForm">
+          <!-- Nombre -->
+          <div class="form-group">
+            <label class="form-label">
+              <i class="bi bi-person-fill"></i>
+              Nombre Completo <span class="required">*</span>
+            </label>
+            <div class="input-wrapper">
+              <i class="bi bi-person-badge input-icon"></i>
+              <input 
+                class="form-input"
+                [class.error]="nombre.touched && nombre.invalid"
+                [(ngModel)]="formUser.nombre" 
+                name="nombre"
+                required
+                pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+"
+                #nombre="ngModel"
+                placeholder="Ej: Juan Pérez González"
+              />
+            </div>
+            <div class="error-message" *ngIf="nombre.touched && nombre.invalid">
+              <i class="bi bi-exclamation-circle-fill"></i>
+              <span *ngIf="nombre.errors?.['required']">El nombre es requerido</span>
+              <span *ngIf="nombre.errors?.['pattern']">Solo se permiten letras y espacios</span>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="form-group">
+            <label class="form-label">
+              <i class="bi bi-envelope-fill"></i>
+              Correo Electrónico <span class="required">*</span>
+            </label>
+            <div class="input-wrapper">
+              <i class="bi bi-at input-icon"></i>
+              <input 
+                class="form-input"
+                [class.error]="correo.touched && correo.invalid"
+                type="email"
+                [(ngModel)]="formUser.correo" 
+                name="correo"
+                required
+                email
+                #correo="ngModel"
+                [placeholder]="getEmailPlaceholder()"
+              />
+            </div>
+            <div class="error-message" *ngIf="correo.touched && correo.invalid">
+              <i class="bi bi-exclamation-circle-fill"></i>
+              <span *ngIf="correo.errors?.['required']">El correo es requerido</span>
+              <span *ngIf="correo.errors?.['email']">Ingrese un correo válido</span>
+              <span *ngIf="getEmailErrorMessage()">{{ getEmailErrorMessage() }}</span>
+            </div>
+          </div>
+
+          <!-- Rol -->
+          <div class="form-group">
+            <label class="form-label">
+              <i class="bi bi-shield-fill"></i>
+              Rol <span class="required">*</span>
+            </label>
+            <div class="role-selector">
+              <label class="role-option" [class.active]="formUser.rol === 'student'">
+                <input type="radio" [(ngModel)]="formUser.rol" name="rol" value="student" (change)="onRoleChange()" />
+                <span class="role-content">
+                  <i class="bi bi-mortarboard-fill"></i>
+                  <span class="role-name">Estudiante</span>
+                  <span class="role-domain">@alumno.buap.mx</span>
+                </span>
+              </label>
+              <label class="role-option" [class.active]="formUser.rol === 'teacher'">
+                <input type="radio" [(ngModel)]="formUser.rol" name="rol" value="teacher" (change)="onRoleChange()" />
+                <span class="role-content">
+                  <i class="bi bi-person-workspace"></i>
+                  <span class="role-name">Profesor</span>
+                  <span class="role-domain">@buap.mx</span>
+                </span>
+              </label>
+              <label class="role-option" [class.active]="formUser.rol === 'admin'">
+                <input type="radio" [(ngModel)]="formUser.rol" name="rol" value="admin" (change)="onRoleChange()" />
+                <span class="role-content">
+                  <i class="bi bi-shield-shaded"></i>
+                  <span class="role-name">Administrador</span>
+                  <span class="role-domain">@admin.buap.mx</span>
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Contraseña (solo creación) -->
+          <div class="form-group" *ngIf="!editingUser">
+            <label class="form-label">
+              <i class="bi bi-key-fill"></i>
+              Contraseña <span class="required">*</span>
+            </label>
+            <div class="input-wrapper">
+              <i class="bi bi-lock-fill input-icon"></i>
+              <input 
+                class="form-input"
+                [class.error]="contrasena.touched && contrasena.invalid"
+                type="password"
+                [(ngModel)]="formUser.contrasena" 
+                name="contrasena"
+                required
+                minlength="8"
+                pattern="^(?=.*[A-Z])(?=.*\d).{8,}$"
+                #contrasena="ngModel"
+                placeholder="••••••••"
+              />
+            </div>
+            <div class="error-message" *ngIf="contrasena.touched && contrasena.invalid">
+              <i class="bi bi-exclamation-circle-fill"></i>
               <span *ngIf="contrasena.errors?.['required']">La contraseña es requerida</span>
               <span *ngIf="contrasena.errors?.['minlength']">Mínimo 8 caracteres</span>
               <span *ngIf="contrasena.errors?.['pattern']">Debe tener al menos una mayúscula y un número</span>
             </div>
+            <div class="password-hint" *ngIf="!contrasena.touched || contrasena.valid">
+              <i class="bi bi-info-circle"></i>
+              Mínimo 8 caracteres, una mayúscula y un número
+            </div>
           </div>
 
-          <!-- Confirmar Contraseña (solo para creación) -->
-          <div class="mb-3" *ngIf="!editingUser">
-            <label class="form-label small text-muted">Confirmar Contraseña *</label>
-            <input class="form-control" 
-                   type="password"
-                   [(ngModel)]="formUser.confirmPassword" 
-                   name="confirmPassword"
-                   required
-                   #confirmPassword="ngModel">
-            <div class="text-danger small mt-1" *ngIf="confirmPassword.touched && confirmPassword.invalid">
-              <span *ngIf="confirmPassword.errors?.['required']">Confirma tu contraseña</span>
-              <span *ngIf="passwordsMismatch">Las contraseñas no coinciden</span>
+          <!-- Confirmar Contraseña (solo creación) -->
+          <div class="form-group" *ngIf="!editingUser">
+            <label class="form-label">
+              <i class="bi bi-check-circle-fill"></i>
+              Confirmar Contraseña <span class="required">*</span>
+            </label>
+            <div class="input-wrapper">
+              <i class="bi bi-shield-lock-fill input-icon"></i>
+              <input 
+                class="form-input"
+                [class.error]="(confirmPassword.touched && confirmPassword.invalid) || passwordsMismatch"
+                type="password"
+                [(ngModel)]="formUser.confirmPassword" 
+                name="confirmPassword"
+                required
+                #confirmPassword="ngModel"
+                placeholder="••••••••"
+              />
+            </div>
+            <div class="error-message" *ngIf="confirmPassword.touched && confirmPassword.invalid">
+              <i class="bi bi-exclamation-circle-fill"></i>
+              <span>Confirma tu contraseña</span>
+            </div>
+            <div class="error-message" *ngIf="passwordsMismatch">
+              <i class="bi bi-exclamation-circle-fill"></i>
+              <span>Las contraseñas no coinciden</span>
             </div>
           </div>
 
           <!-- Nueva Contraseña (para edición) -->
-          <div class="mb-3" *ngIf="editingUser">
-            <label class="form-label small text-muted">Nueva Contraseña (opcional)</label>
-            <input class="form-control" 
-                   type="password"
-                   [(ngModel)]="formUser.contrasena" 
-                   name="contrasena"
-                   minlength="8"
-                   pattern="^(?=.*[A-Z])(?=.*\d).{8,}$"
-                   #nuevaContrasena="ngModel"
-                   placeholder="Dejar en blanco para mantener la actual">
-            <div class="text-danger small mt-1" *ngIf="nuevaContrasena.touched && nuevaContrasena.invalid">
+          <div class="form-group" *ngIf="editingUser">
+            <label class="form-label">
+              <i class="bi bi-key-fill"></i>
+              Nueva Contraseña <span class="optional">(opcional)</span>
+            </label>
+            <div class="input-wrapper">
+              <i class="bi bi-lock-fill input-icon"></i>
+              <input 
+                class="form-input"
+                [class.error]="nuevaContrasena.touched && nuevaContrasena.invalid"
+                type="password"
+                [(ngModel)]="formUser.contrasena" 
+                name="contrasena"
+                minlength="8"
+                pattern="^(?=.*[A-Z])(?=.*\d).{8,}$"
+                #nuevaContrasena="ngModel"
+                placeholder="Dejar en blanco para mantener"
+              />
+            </div>
+            <div class="error-message" *ngIf="nuevaContrasena.touched && nuevaContrasena.invalid">
+              <i class="bi bi-exclamation-circle-fill"></i>
               <span *ngIf="nuevaContrasena.errors?.['minlength']">Mínimo 8 caracteres</span>
               <span *ngIf="nuevaContrasena.errors?.['pattern']">Debe tener al menos una mayúscula y un número</span>
             </div>
           </div>
         </form>
       </div>
-      <div class="modal-footer border-0">
-        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn btn-primary" 
+
+      <div class="modal-footer">
+        <button type="button" class="btn-cancel" data-bs-dismiss="modal">
+          <i class="bi bi-x-lg"></i>
+          Cancelar
+        </button>
+        <button type="button" class="btn-save" 
                 (click)="saveUser()"
                 [disabled]="saving || userForm.invalid || passwordsMismatch">
-          <span *ngIf="!saving"><i class="bi bi-check-lg me-2"></i> Guardar</span>
+          <span *ngIf="!saving">
+            <i class="bi bi-check-lg"></i>
+            {{ editingUser ? 'Guardar Cambios' : 'Crear Usuario' }}
+          </span>
           <span *ngIf="saving">
-            <span class="spinner-border spinner-border-sm me-2"></span>
-            Guardando...
+            <span class="spinner"></span>
+            {{ editingUser ? 'Guardando...' : 'Creando...' }}
           </span>
         </button>
       </div>

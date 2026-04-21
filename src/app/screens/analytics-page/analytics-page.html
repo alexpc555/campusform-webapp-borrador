@@ -1,178 +1,270 @@
 <div class="analytics-root">
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-glass sticky-top border-bottom">
-    <div class="container py-2 position-relative">
-      <a class="navbar-brand d-flex align-items-center gap-2" routerLink="/">
-        <span class="brand-icon">
+  <nav class="navbar-glass">
+    <div class="navbar-container">
+      <a class="brand-wrapper" routerLink="/">
+        <div class="brand-icon">
           <i class="bi bi-mortarboard-fill"></i>
-        </span>
-        <span class="brand-text">CampusForum</span>
+        </div>
+        <span class="brand-name">CampusForum</span>
       </a>
 
-      <div class="ms-auto d-flex align-items-center gap-2">
-        <button class="btn btn-outline-primary rounded-pill px-3" (click)="volver()">
-  <i class="bi bi-arrow-left me-1"></i>
-  {{ getTextoVolver() }}
-</button>
+      <div class="navbar-actions">
+        <span class="page-badge">
+          <i class="bi bi-bar-chart-fill"></i>
+          Analytics Dashboard
+        </span>
+
+        <button class="btn-download" (click)="downloadPDF()" [disabled]="loading">
+          <i class="bi bi-file-pdf-fill"></i>
+          <span>Descargar PDF</span>
+        </button>
+
+        <button class="btn-back" (click)="volver()">
+          <i class="bi bi-arrow-left"></i>
+          <span>{{ getTextoVolver() }}</span>
+        </button>
       </div>
     </div>
   </nav>
 
-  <section class="container py-5">
-    <div class="glass-card p-4 p-md-5 mb-4 hero-block">
-      <span class="badge-soft mb-3 d-inline-flex">Panel de estadísticas</span>
-      <h1 class="page-title mb-2">Analytics Dashboard</h1>
-      <p class="page-subtitle mb-0">
-        Consulta métricas clave, actividad general y publicaciones por categoría.
-      </p>
+  <!-- Header Section -->
+  <section class="header-section">
+    <div class="container">
+      <div class="header-content fade-in-up">
+        <div class="header-icon">
+          <i class="bi bi-bar-chart-fill"></i>
+        </div>
+        <div class="header-text">
+          <h1 class="header-title">Analytics Dashboard</h1>
+          <p class="header-subtitle">Consulta métricas clave, actividad general y publicaciones por categoría</p>
+        </div>
+      </div>
     </div>
+  </section>
 
-    <div *ngIf="loading" class="glass-card p-4 text-center">
-      <div class="spinner-border text-primary mb-3" role="status"></div>
-      <p class="mb-0">Cargando estadísticas...</p>
-    </div>
+  <!-- Main Content -->
+  <section class="content-section">
+    <div class="container">
+      <!-- Loading State -->
+      <div class="loading-state fade-in-up" *ngIf="loading">
+        <div class="loading-spinner">
+          <div class="spinner-blue"></div>
+        </div>
+        <p class="loading-text">Cargando estadísticas...</p>
+      </div>
 
-    <div *ngIf="error" class="glass-card p-4 text-center error-card">
-      <i class="bi bi-exclamation-triangle-fill error-icon"></i>
-      <p class="mb-0 mt-2">{{ error }}</p>
-    </div>
+      <!-- Error State -->
+      <div class="alert-error fade-in-up" *ngIf="error && !loading">
+        <i class="bi bi-exclamation-circle-fill"></i>
+        <span>{{ error }}</span>
+        <button class="retry-btn" (click)="ngOnInit()">
+          <i class="bi bi-arrow-repeat"></i>
+          Reintentar
+        </button>
+      </div>
 
-    <ng-container *ngIf="!loading && !error">
-      <!-- Cards resumen -->
-      <div class="row g-4 mb-4">
-        <div class="col-md-6 col-xl-3" *ngFor="let stat of stats">
-          <div class="glass-card stat-card p-4 h-100 shadow-sm">
-            <div class="d-flex justify-content-between align-items-start">
-              <div>
-                <div class="stat-label">{{ stat.label }}</div>
-                <div class="stat-value">{{ stat.value }}</div>
-              </div>
-              <div class="stat-icon-wrap">
-                <i [class]="stat.icon + ' stat-icon'"></i>
-              </div>
+      <!-- Content -->
+      <ng-container *ngIf="!loading && !error">
+        <!-- Stats Cards -->
+        <div class="stats-grid fade-in-up delay-1">
+          <div class="stat-card" *ngFor="let stat of stats">
+            <div class="stat-content">
+              <div class="stat-label">{{ stat.label }}</div>
+              <div class="stat-value">{{ stat.value }}</div>
+            </div>
+            <div class="stat-icon-wrapper">
+              <i [class]="stat.icon + ' stat-icon'"></i>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Sección principal -->
-      <div class="row g-4">
-        <!-- Gráfica -->
-        <div class="col-lg-8">
-          <div class="glass-card p-4 h-100 shadow-sm">
-            <div class="section-head">
-              <h3 class="section-title mb-1">Publicaciones por categoría</h3>
-              <p class="section-subtitle mb-0">
-                Distribución actual de publicaciones registradas.
-              </p>
+        <!-- Charts and Summary -->
+        <div class="charts-row fade-in-up delay-2">
+          <!-- Bar Chart -->
+          <div class="chart-card">
+            <div class="card-header">
+              <div class="card-title-wrapper">
+                <i class="bi bi-bar-chart-line-fill card-title-icon"></i>
+                <h3 class="card-title">Publicaciones por Categoría</h3>
+              </div>
+              <p class="card-subtitle">Distribución actual de publicaciones registradas</p>
             </div>
 
-            <div *ngIf="postsPerCategory.length > 0" class="chart-wrap mt-4">
-              <div class="chart">
-                <div class="bar-container" *ngFor="let item of postsPerCategory">
-                  <div
-                    class="bar"
-                    [style.height.px]="item.posts * 28">
+            <div class="chart-body" *ngIf="postsPerCategory.length > 0">
+              <div class="bar-chart">
+                <div class="bar-wrapper" *ngFor="let item of postsPerCategory">
+                  <div class="bar-container">
+                    <div class="bar-value">{{ item.posts }}</div>
+                    <div 
+                      class="bar" 
+                      [style.height.px]="getBarHeight(item.posts)"
+                      [style.background]="getBarColor(item.posts)"
+                    ></div>
                   </div>
-                  <div class="bar-value">{{ item.posts }}</div>
-                  <div class="bar-label">{{ item.name }}</div>
+                  <div class="bar-label">{{ truncateText(item.name, 12) }}</div>
                 </div>
               </div>
             </div>
 
-            <div *ngIf="postsPerCategory.length === 0" class="empty-state">
-              <i class="bi bi-bar-chart-line empty-icon"></i>
-              <p class="mb-0">Aún no hay categorías con publicaciones para mostrar.</p>
+            <div class="chart-empty" *ngIf="postsPerCategory.length === 0">
+              <i class="bi bi-bar-chart"></i>
+              <p>Aún no hay categorías con publicaciones</p>
+            </div>
+          </div>
+
+          <!-- Summary Card -->
+          <div class="summary-card">
+            <div class="card-header">
+              <div class="card-title-wrapper">
+                <i class="bi bi-clipboard-data-fill card-title-icon"></i>
+                <h3 class="card-title">Resumen General</h3>
+              </div>
+              <p class="card-subtitle">Indicadores principales del sistema</p>
+            </div>
+
+            <div class="summary-list">
+              <div class="summary-item">
+                <div class="summary-info">
+                  <span class="summary-label">Total Usuarios</span>
+                  <span class="summary-value">{{ getStatValue(0) }}</span>
+                </div>
+                <div class="summary-icon blue">
+                  <i class="bi bi-people-fill"></i>
+                </div>
+              </div>
+
+              <div class="summary-item">
+                <div class="summary-info">
+                  <span class="summary-label">Estudiantes</span>
+                  <span class="summary-value">{{ summaryData?.total_alumnos || 0 }}</span>
+                </div>
+                <div class="summary-icon green">
+                  <i class="bi bi-mortarboard-fill"></i>
+                </div>
+              </div>
+
+              <div class="summary-item">
+                <div class="summary-info">
+                  <span class="summary-label">Profesores</span>
+                  <span class="summary-value">{{ summaryData?.total_profesores || 0 }}</span>
+                </div>
+                <div class="summary-icon orange">
+                  <i class="bi bi-person-workspace"></i>
+                </div>
+              </div>
+
+              <div class="summary-item">
+                <div class="summary-info">
+                  <span class="summary-label">Administradores</span>
+                  <span class="summary-value">{{ summaryData?.total_admins || 0 }}</span>
+                </div>
+                <div class="summary-icon purple">
+                  <i class="bi bi-shield-shaded"></i>
+                </div>
+              </div>
+
+              <div class="summary-divider"></div>
+
+              <div class="summary-item">
+                <div class="summary-info">
+                  <span class="summary-label">Publicaciones Totales</span>
+                  <span class="summary-value">{{ getStatValue(1) }}</span>
+                </div>
+                <div class="summary-icon blue">
+                  <i class="bi bi-file-post-fill"></i>
+                </div>
+              </div>
+
+              <div class="summary-item">
+                <div class="summary-info">
+                  <span class="summary-label">Comentarios Totales</span>
+                  <span class="summary-value">{{ getStatValue(2) }}</span>
+                </div>
+                <div class="summary-icon green">
+                  <i class="bi bi-chat-dots-fill"></i>
+                </div>
+              </div>
+
+              <div class="summary-item">
+                <div class="summary-info">
+                  <span class="summary-label">Reportes Totales</span>
+                  <span class="summary-value">{{ summaryData?.total_reports || 0 }}</span>
+                </div>
+                <div class="summary-icon red">
+                  <i class="bi bi-flag-fill"></i>
+                </div>
+              </div>
+
+              <div class="summary-item highlight">
+                <div class="summary-info">
+                  <span class="summary-label">Promedio Comentarios/Post</span>
+                  <span class="summary-value">{{ getStatValue(3) }}</span>
+                </div>
+                <div class="summary-icon purple">
+                  <i class="bi bi-graph-up-arrow"></i>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Resumen lateral -->
-        <div class="col-lg-4">
-          <div class="glass-card p-4 h-100 shadow-sm">
-            <div class="section-head">
-              <h3 class="section-title mb-1">Resumen general</h3>
-              <p class="section-subtitle mb-0">
-                Indicadores principales del sistema.
-              </p>
+        <!-- Details Table -->
+        <div class="table-card fade-in-up delay-3">
+          <div class="card-header">
+            <div class="card-title-wrapper">
+              <i class="bi bi-table card-title-icon"></i>
+              <h3 class="card-title">Detalle por Categoría</h3>
             </div>
+            <p class="card-subtitle">Listado ordenado de publicaciones por categoría</p>
+          </div>
 
-            <div class="metrics-list mt-4">
-              <div class="metric-row">
-                <div>
-                  <div class="metric-label">Usuarios registrados</div>
-                  <div class="metric-value">{{ stats[0]?.value }}</div>
-                </div>
-                <i class="bi bi-people metric-icon"></i>
-              </div>
-
-              <div class="metric-row">
-                <div>
-                  <div class="metric-label">Publicaciones totales</div>
-                  <div class="metric-value">{{ stats[1]?.value }}</div>
-                </div>
-                <i class="bi bi-file-earmark-text metric-icon"></i>
-              </div>
-
-              <div class="metric-row">
-                <div>
-                  <div class="metric-label">Comentarios totales</div>
-                  <div class="metric-value">{{ stats[2]?.value }}</div>
-                </div>
-                <i class="bi bi-chat-left-text metric-icon"></i>
-              </div>
-
-              <div class="metric-row">
-                <div>
-                  <div class="metric-label">Promedio por publicación</div>
-                  <div class="metric-value">{{ stats[3]?.value }}</div>
-                </div>
-                <i class="bi bi-graph-up metric-icon"></i>
-              </div>
-            </div>
+          <div class="table-responsive">
+            <table class="details-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Categoría</th>
+                  <th class="text-center">Publicaciones</th>
+                  <th class="text-center">Porcentaje</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of postsPerCategory; let i = index">
+                  <td class="rank-cell">{{ i + 1 }}</td>
+                  <td>
+                    <div class="category-cell">
+                      <div class="category-dot" [style.background]="getCategoryColor(i)"></div>
+                      <span>{{ item.name }}</span>
+                    </div>
+                  </td>
+                  <td class="text-center">
+                    <span class="count-badge">{{ item.posts }}</span>
+                  </td>
+                  <td class="text-center">
+                    <div class="percentage-bar-container">
+                      <div 
+                        class="percentage-bar" 
+                        [style.width]="getPercentage(item.posts) + '%'"
+                        [style.background]="getCategoryColor(i)"
+                      ></div>
+                      <span class="percentage-text">{{ getPercentage(item.posts) }}%</span>
+                    </div>
+                  </td>
+                </tr>
+                <tr *ngIf="postsPerCategory.length === 0">
+                  <td colspan="4">
+                    <div class="empty-state">
+                      <i class="bi bi-inbox"></i>
+                      <p>No hay datos disponibles</p>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
-      </div>
-
-      <!-- Lista inferior -->
-      <div class="row g-4 mt-1">
-        <div class="col-12">
-          <div class="glass-card p-4 shadow-sm">
-            <div class="section-head">
-              <h3 class="section-title mb-1">Detalle por categoría</h3>
-              <p class="section-subtitle mb-0">
-                Listado ordenado de publicaciones por categoría.
-              </p>
-            </div>
-
-            <div class="table-responsive mt-4">
-              <table class="table align-middle analytics-table mb-0">
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Categoría</th>
-                    <th>Publicaciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let item of postsPerCategory; let i = index">
-                    <td>{{ i + 1 }}</td>
-                    <td>{{ item.name }}</td>
-                    <td>
-                      <span class="table-badge">{{ item.posts }}</span>
-                    </td>
-                  </tr>
-                  <tr *ngIf="postsPerCategory.length === 0">
-                    <td colspan="3" class="text-center py-4">
-                      No hay datos disponibles.
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-    </ng-container>
+      </ng-container>
+    </div>
   </section>
 </div>

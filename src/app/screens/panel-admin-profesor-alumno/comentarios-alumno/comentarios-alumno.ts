@@ -48,4 +48,11 @@ export class ComentariosAlumno implements OnInit {
   verPostOriginal(postId: number): void {
     this.router.navigate(['/dashboard'], { queryParams: { postId } });
   }
+  getInitials(name: string): string {
+  if (!name) return 'AL';
+  const words = name.split(' ');
+  if (words.length >= 2) {
+    return (words[0][0] + words[1][0]).toUpperCase();
+  }
+  return name.substring(0, 2).toUpperCase();}
 }

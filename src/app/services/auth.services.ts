@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
@@ -35,17 +35,29 @@ export interface AuthResponse {
 })
 export class AuthService {
   private apiUrl = environment.apiUrl;
+  
   constructor(
     private http: HttpClient,
     private router: Router
   ) {}
 
   register(payload: RegisterPayload): Observable<any> {
-    return this.http.post(`${this.apiUrl}/auth/register/`, payload);
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+    });
+    
+    console.log('📤 Enviando registro a:', `${this.apiUrl}/auth/register/`);
+    console.log('📦 Payload:', payload);
+    
+    return this.http.post(`${this.apiUrl}/auth/register/`, payload, { headers });
   }
 
   login(credentials: LoginPayload): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/login/`, credentials).pipe(
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+    });
+    
+    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/login/`, credentials, { headers }).pipe(
       tap((response: AuthResponse) => {
         if (response.user && response.token) {
           // Guardar token y datos del usuario
@@ -58,7 +70,7 @@ export class AuthService {
           
           // Redirigir según el rol
           const redirectMap: { [key: string]: string } = {
-            'student': '/student-panel',   // Cambiado de '/dashboard' a '/student-panel'
+            'student': '/student-panel',
             'teacher': '/profesor',
             'admin': '/admin'
           };
@@ -103,7 +115,11 @@ export class AuthService {
 
   refreshToken(): Observable<any> {
     const refresh = localStorage.getItem('refresh');
-    return this.http.post(`${this.apiUrl}/auth/refresh/`, { refresh }).pipe(
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+    });
+    
+    return this.http.post(`${this.apiUrl}/auth/refresh/`, { refresh }, { headers }).pipe(
       tap((response: any) => {
         if (response.access) {
           localStorage.setItem('token', response.access);

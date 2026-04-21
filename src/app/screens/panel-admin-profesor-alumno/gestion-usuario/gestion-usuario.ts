@@ -3,8 +3,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { UserService, User, CreateUserPayload } from '../../../services/user.services';
-import { SHARED_IMPORTS, bootstrap } from '../../../shared/shared.imports';
-import { ValidatorServices } from '../../../services/tools/validator.services';
+import { SHARED_IMPORTS } from '../../../shared/shared.imports';
+
+// Declarar bootstrap global
+declare var bootstrap: any;
 
 @Component({
   selector: 'app-gestion-usuario',
@@ -19,11 +21,9 @@ export class GestionUsuario implements OnInit {
   errorMessage = '';
   saving = false;
 
-  // Filtros
   search = '';
   roleFilter: string = 'all';
 
-  // Formulario usuario
   formUser: any = {
     nombre: '',
     correo: '',
@@ -34,26 +34,21 @@ export class GestionUsuario implements OnInit {
   
   editingUser: User | null = null;
   modalTitle = 'Crear Usuario';
-  private modal: any;
+  private modalInstance: any = null;
 
-  // Mapa de dominios para mostrar en mensajes de error
   domainMap = {
     student: '@alumno.buap.mx',
     teacher: '@buap.mx',
     admin: '@admin.buap.mx'
   };
 
-  // Mapa de nombres de roles en español
   roleNames = {
     student: 'estudiante',
     teacher: 'profesor',
     admin: 'administrador'
   };
 
-  constructor(
-    private userService: UserService,
-    private validators: ValidatorServices
-  ) {}
+  constructor(private userService: UserService) {}
 
   ngOnInit() {
     this.loadUsers();
@@ -93,7 +88,6 @@ export class GestionUsuario implements OnInit {
     const roleValue = this.formUser.rol;
 
     if (email && roleValue) {
-      // Validar email según el rol
       let isValid = false;
       let expectedDomain = '';
 
@@ -121,7 +115,6 @@ export class GestionUsuario implements OnInit {
   }
 
   onRoleChange() {
-    // Limpiar el email cuando cambia el rol para que se revalide
     this.formUser.correo = '';
   }
 
@@ -156,7 +149,7 @@ export class GestionUsuario implements OnInit {
       confirmPassword: '',
       rol: 'student'
     };
-    this.openModal();
+    this.showModal();
   }
 
   editUser(user: User) {
@@ -169,7 +162,7 @@ export class GestionUsuario implements OnInit {
       confirmPassword: '',
       rol: user.rol
     };
-    this.openModal();
+    this.showModal();
   }
 
   validateEmail(): boolean {
@@ -178,22 +171,16 @@ export class GestionUsuario implements OnInit {
 
     if (!email) return false;
 
-    let isValid = false;
     switch (role) {
       case 'student':
-        isValid = /^[^\s@]+@alumno\.buap\.mx$/i.test(email);
-        break;
+        return /^[^\s@]+@alumno\.buap\.mx$/i.test(email);
       case 'teacher':
-        isValid = /^[^\s@]+@buap\.mx$/i.test(email);
-        break;
+        return /^[^\s@]+@buap\.mx$/i.test(email);
       case 'admin':
-        isValid = /^[^\s@]+@admin\.buap\.mx$/i.test(email);
-        break;
+        return /^[^\s@]+@admin\.buap\.mx$/i.test(email);
       default:
-        isValid = false;
+        return false;
     }
-
-    return isValid;
   }
 
   validateName(): boolean {
@@ -210,11 +197,10 @@ export class GestionUsuario implements OnInit {
       const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
       return passwordRegex.test(password);
     }
-    return true; // Si no hay contraseña nueva, es válido
+    return true;
   }
 
   saveUser() {
-    // Validaciones
     if (!this.formUser.nombre?.trim()) {
       alert('El nombre es requerido.');
       return;
@@ -260,7 +246,6 @@ export class GestionUsuario implements OnInit {
     this.saving = true;
 
     if (this.editingUser) {
-      // Preparar payload para actualización
       const updatePayload: any = {
         nombre: this.formUser.nombre.trim(),
         correo: this.formUser.correo.trim().toLowerCase(),
@@ -274,7 +259,7 @@ export class GestionUsuario implements OnInit {
       this.userService.updateUser(this.editingUser.id, updatePayload).subscribe({
         next: (updatedUser) => {
           this.users = this.users.map(u => u.id === updatedUser.id ? updatedUser : u);
-          this.closeModal();
+          this.hideModal();
           this.saving = false;
         },
         error: (err) => {
@@ -284,7 +269,6 @@ export class GestionUsuario implements OnInit {
         }
       });
     } else {
-      // Crear nuevo usuario
       const createPayload: CreateUserPayload = {
         nombre: this.formUser.nombre.trim(),
         correo: this.formUser.correo.trim().toLowerCase(),
@@ -295,7 +279,7 @@ export class GestionUsuario implements OnInit {
       this.userService.createUser(createPayload).subscribe({
         next: (newUser) => {
           this.users = [newUser, ...this.users];
-          this.closeModal();
+          this.hideModal();
           this.saving = false;
         },
         error: (err) => {
@@ -346,25 +330,54 @@ export class GestionUsuario implements OnInit {
 
   getRoleBadgeClass(role: string): string {
     switch(role) {
-      case 'student': return 'badge-info';
-      case 'teacher': return 'badge-warning';
-      case 'admin': return 'badge-danger';
-      default: return 'badge-secondary';
+      case 'student': return 'student';
+      case 'teacher': return 'teacher';
+      case 'admin': return 'admin';
+      default: return 'student';
     }
   }
 
-  private openModal() {
+  getRoleAvatarClass(role: string): string {
+    switch(role) {
+      case 'student': return 'student';
+      case 'teacher': return 'teacher';
+      case 'admin': return 'admin';
+      default: return 'student';
+    }
+  }
+
+  private showModal() {
     const modalElement = document.getElementById('userModal');
     if (modalElement) {
-      this.modal = new bootstrap.Modal(modalElement);
-      this.modal.show();
+      // Limpiar backdrops existentes
+      this.cleanupBackdrops();
+      
+      // Crear nueva instancia del modal
+      this.modalInstance = new bootstrap.Modal(modalElement, {
+        backdrop: 'static',
+        keyboard: true
+      });
+      
+      this.modalInstance.show();
     }
   }
 
-  private closeModal() {
-    if (this.modal) {
-      this.modal.hide();
-      this.modal = null;
+  private hideModal() {
+    if (this.modalInstance) {
+      this.modalInstance.hide();
+      this.modalInstance = null;
     }
+    this.cleanupBackdrops();
+  }
+
+  private cleanupBackdrops() {
+    // Eliminar backdrops residuales
+    const backdrops = document.querySelectorAll('.modal-backdrop');
+    backdrops.forEach(backdrop => backdrop.remove());
+    
+    // Restaurar el body
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
   }
 }

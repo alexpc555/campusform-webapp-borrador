@@ -1,170 +1,261 @@
-<div class="landing-root">
+<div class="categorias-root">
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-glass sticky-top border-bottom">
-    <div class="container py-2 position-relative">
-      <a class="navbar-brand d-flex align-items-center gap-2" routerLink="/admin">
-        <span class="brand-icon"><i class="bi bi-mortarboard-fill"></i></span>
+  <nav class="navbar-glass">
+    <div class="navbar-container">
+      <a class="brand-wrapper" routerLink="/admin">
+        <div class="brand-icon">
+          <i class="bi bi-mortarboard-fill"></i>
+        </div>
         <span class="brand-name">CampusForum</span>
       </a>
 
-      <div class="ms-auto d-flex align-items-center gap-2">
-        <span class="badge badge-soft d-none d-md-inline">Admin • Categorías</span>
-        <a class="btn btn-outline-primary" routerLink="/admin">Volver</a>
+      <div class="navbar-actions">
+        <span class="page-badge">
+          <i class="bi bi-tags-fill"></i>
+          Gestión de Categorías
+        </span>
+
+        <button class="btn-back" routerLink="/admin">
+          <i class="bi bi-arrow-left"></i>
+          <span>Volver</span>
+        </button>
       </div>
     </div>
   </nav>
 
-  <section class="container py-5">
-    <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 mb-4">
-      <div>
-        <h1 class="section-title mb-2">Administración de Categorías</h1>
-        <p class="section-subtitle mb-0">Crea, edita y elimina categorías del foro</p>
-      </div>
-
-      <div class="d-flex gap-2 align-items-center">
-        <input class="form-control form-control-sm search-input"
-               placeholder="Buscar categoría..."
-               [(ngModel)]="search" />
-      </div>
-    </div>
-
-    <!-- Mensaje de error -->
-    <div class="alert alert-danger" *ngIf="errorMessage">
-      {{ errorMessage }}
-      <button class="btn btn-sm btn-outline-danger ms-3" (click)="loadCategories()">
-        Reintentar
-      </button>
-    </div>
-
-    <!-- Crear categoría -->
-    <div class="glass-card p-4 mb-4">
-      <h2 class="feature-title mb-3">Nueva categoría</h2>
-
-      <div class="row g-2 align-items-end">
-        <div class="col-md-5">
-          <label class="form-label small text-muted">Nombre</label>
-          <input class="form-control" 
-                 [(ngModel)]="newCategory.nombre" 
-                 placeholder="Ej: Química"
-                 [disabled]="loading" />
+  <!-- Header Section -->
+  <section class="header-section">
+    <div class="container">
+      <div class="header-content fade-in-up">
+        <div class="header-icon">
+          <i class="bi bi-tags-fill"></i>
         </div>
-
-        <div class="col-md-5">
-          <label class="form-label small text-muted">Descripción</label>
-          <input class="form-control" 
-                 [(ngModel)]="newCategory.descripcion" 
-                 placeholder="Ej: Orgánica, inorgánica..."
-                 [disabled]="loading" />
-        </div>
-
-        <div class="col-md-2 d-grid">
-          <button class="btn btn-primary" 
-                  (click)="createCategory()"
-                  [disabled]="loading">
-            <span *ngIf="!loading"><i class="bi bi-plus-lg me-2"></i> Crear</span>
-            <span *ngIf="loading">
-              <span class="spinner-border spinner-border-sm me-2"></span>
-              Creando...
-            </span>
-          </button>
+        <div class="header-text">
+          <h1 class="header-title">Administración de Categorías</h1>
+          <p class="header-subtitle">Crea, edita y elimina categorías del foro</p>
         </div>
       </div>
     </div>
+  </section>
 
-    <!-- Tabla -->
-    <div class="glass-card p-3 p-md-4">
-      <!-- Spinner de carga -->
-      <div class="text-center py-5" *ngIf="loading && categories.length === 0">
-        <div class="spinner-border text-primary mb-3" role="status">
-          <span class="visually-hidden">Cargando...</span>
+  <!-- Main Content -->
+  <section class="content-section">
+    <div class="container">
+      <!-- Create Category Card -->
+      <div class="create-card fade-in-up delay-1">
+        <div class="create-header">
+          <div class="create-icon">
+            <i class="bi bi-plus-circle-fill"></i>
+          </div>
+          <h2 class="create-title">Nueva Categoría</h2>
         </div>
-        <p class="text-muted">Cargando categorías...</p>
+
+        <div class="create-form">
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label class="form-label">
+                <i class="bi bi-fonts"></i>
+                Nombre
+              </label>
+              <div class="input-wrapper">
+                <i class="bi bi-tag input-icon"></i>
+                <input 
+                  class="form-input"
+                  [(ngModel)]="newCategory.nombre" 
+                  placeholder="Ej: Química Orgánica"
+                  [disabled]="loading"
+                />
+              </div>
+            </div>
+
+            <div class="form-group flex-2">
+              <label class="form-label">
+                <i class="bi bi-file-text"></i>
+                Descripción
+              </label>
+              <div class="input-wrapper">
+                <i class="bi bi-pencil input-icon"></i>
+                <input 
+                  class="form-input"
+                  [(ngModel)]="newCategory.descripcion" 
+                  placeholder="Ej: Temas relacionados con química orgánica e inorgánica"
+                  [disabled]="loading"
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <button class="btn-create" (click)="createCategory()" [disabled]="loading">
+                <span *ngIf="!loading">
+                  <i class="bi bi-plus-lg"></i>
+                  Crear Categoría
+                </span>
+                <span *ngIf="loading">
+                  <span class="spinner"></span>
+                  Creando...
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <!-- Tabla (solo si no está cargando o ya hay datos) -->
-      <div class="table-responsive" *ngIf="!loading || categories.length > 0">
-        <table class="table table-wire align-middle mb-0">
-          <thead>
-            <tr>
-              <th>Categoría</th>
-              <th>Descripción</th>
-              <th class="text-center">Posts</th>
-              <th class="text-end">Acciones</th>
-            </tr>
-          </thead>
+      <!-- Error Message -->
+      <div class="alert-error fade-in-up delay-1" *ngIf="errorMessage">
+        <i class="bi bi-exclamation-circle-fill"></i>
+        <span>{{ errorMessage }}</span>
+        <button class="retry-btn" (click)="loadCategories()">
+          <i class="bi bi-arrow-repeat"></i>
+          Reintentar
+        </button>
+      </div>
 
-          <tbody>
-            <tr *ngFor="let c of filteredCategories">
-              <td>
-                <ng-container *ngIf="editingId !== c.id; else editName">
-                  <span class="fw-bold">{{ c.nombre }}</span>
-                </ng-container>
+      <!-- Filters Bar -->
+      <div class="filters-bar fade-in-up delay-1">
+        <div class="search-wrapper">
+          <i class="bi bi-search search-icon"></i>
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Buscar categoría por nombre o descripción..."
+            [(ngModel)]="search"
+          />
+        </div>
+        <div class="results-count">
+          <i class="bi bi-folder"></i>
+          {{ filteredCategories.length }} categorías
+        </div>
+      </div>
 
-                <ng-template #editName>
-                  <input class="form-control form-control-sm edit-input"
-                         [(ngModel)]="editForm.nombre"
-                         [disabled]="loading" />
-                </ng-template>
-              </td>
+      <!-- Loading State -->
+      <div class="loading-state fade-in-up delay-1" *ngIf="loading && categories.length === 0">
+        <div class="loading-spinner">
+          <div class="spinner-blue"></div>
+        </div>
+        <p class="loading-text">Cargando categorías...</p>
+      </div>
 
-              <td>
-                <ng-container *ngIf="editingId !== c.id; else editDesc">
-                  <span class="text-muted">{{ c.descripcion }}</span>
-                </ng-container>
+      <!-- Categories Table -->
+      <div class="table-card fade-in-up delay-1" *ngIf="!loading || categories.length > 0">
+        <div class="table-responsive">
+          <table class="categories-table">
+            <thead>
+              <tr>
+                <th>Categoría</th>
+                <th>Descripción</th>
+                <th class="text-center">Publicaciones</th>
+                <th class="text-end">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let c of filteredCategories" class="category-row">
+                <td>
+                  <ng-container *ngIf="editingId !== c.id; else editName">
+                    <div class="category-info">
+                      <div class="category-icon" [class]="getCategoryColorClass(c.id)">
+                        <i class="bi bi-folder-fill"></i>
+                      </div>
+                      <span class="category-name">{{ c.nombre }}</span>
+                    </div>
+                  </ng-container>
+                  <ng-template #editName>
+                    <div class="edit-input-wrapper">
+                      <i class="bi bi-pencil-fill edit-icon"></i>
+                      <input 
+                        class="edit-input"
+                        [(ngModel)]="editForm.nombre"
+                        [disabled]="loading"
+                        placeholder="Nombre de categoría"
+                      />
+                    </div>
+                  </ng-template>
+                </td>
 
-                <ng-template #editDesc>
-                  <input class="form-control form-control-sm edit-input"
-                         [(ngModel)]="editForm.descripcion"
-                         [disabled]="loading" />
-                </ng-template>
-              </td>
+                <td>
+                  <ng-container *ngIf="editingId !== c.id; else editDesc">
+                    <span class="category-desc">{{ c.descripcion }}</span>
+                  </ng-container>
+                  <ng-template #editDesc>
+                    <div class="edit-input-wrapper">
+                      <i class="bi bi-pencil-fill edit-icon"></i>
+                      <input 
+                        class="edit-input"
+                        [(ngModel)]="editForm.descripcion"
+                        [disabled]="loading"
+                        placeholder="Descripción"
+                      />
+                    </div>
+                  </ng-template>
+                </td>
 
-              <td class="text-center">
-                <span class="badge badge-soft">{{ c.post_count }}</span>
-              </td>
+                <td class="text-center">
+                  <span class="post-count-badge">
+                    <i class="bi bi-file-post"></i>
+                    {{ c.post_count || 0 }}
+                  </span>
+                </td>
 
-              <td class="text-end">
-                <ng-container *ngIf="editingId !== c.id; else editActions">
-                  <button class="btn btn-link text-decoration-none me-2" 
-                          (click)="startEdit(c)" 
-                          title="Editar"
-                          [disabled]="loading">
-                    <i class="bi bi-pencil-square"></i>
-                  </button>
-                  <button class="btn btn-link text-decoration-none text-danger" 
-                          (click)="deleteCategory(c)" 
-                          title="Eliminar"
-                          [disabled]="loading">
-                    <i class="bi bi-trash3"></i>
-                  </button>
-                </ng-container>
+                <td class="text-end">
+                  <ng-container *ngIf="editingId !== c.id; else editActions">
+                    <div class="action-buttons">
+                      <button 
+                        class="btn-edit" 
+                        *ngIf="canEditCategory(c)"
+                        (click)="startEdit(c)" 
+                        [disabled]="loading"
+                        title="Editar"
+                      >
+                        <i class="bi bi-pencil-fill"></i>
+                      </button>
+                      <button 
+                        class="btn-delete" 
+                        *ngIf="canDeleteCategory(c)"
+                        (click)="deleteCategory(c)" 
+                        [disabled]="loading"
+                        title="Eliminar"
+                      >
+                        <i class="bi bi-trash3-fill"></i>
+                      </button>
+                    </div>
+                  </ng-container>
+                  <ng-template #editActions>
+                    <div class="action-buttons">
+                      <button 
+                        class="btn-save-small" 
+                        (click)="saveEdit(c)"
+                        [disabled]="loading"
+                        title="Guardar"
+                      >
+                        <i class="bi bi-check-lg"></i>
+                        Guardar
+                      </button>
+                      <button 
+                        class="btn-cancel-small" 
+                        (click)="cancelEdit()"
+                        [disabled]="loading"
+                        title="Cancelar"
+                      >
+                        <i class="bi bi-x-lg"></i>
+                        Cancelar
+                      </button>
+                    </div>
+                  </ng-template>
+                </td>
+              </tr>
 
-                <ng-template #editActions>
-                  <button class="btn btn-outline-success btn-sm me-2" 
-                          (click)="saveEdit(c)"
-                          [disabled]="loading">
-                    <span *ngIf="!loading"><i class="bi bi-check2"></i> Guardar</span>
-                    <span *ngIf="loading" class="spinner-border spinner-border-sm"></span>
-                  </button>
-
-                  <button class="btn btn-outline-secondary btn-sm" 
-                          (click)="cancelEdit()"
-                          [disabled]="loading">
-                    Cancelar
-                  </button>
-                </ng-template>
-              </td>
-            </tr>
-
-            <tr *ngIf="filteredCategories.length === 0 && !loading">
-              <td colspan="4" class="text-center text-muted py-4">
-                No hay categorías con ese filtro.
-              </td>
-            </tr>
-          </tbody>
-        </table>
+              <tr *ngIf="filteredCategories.length === 0 && !loading">
+                <td colspan="4">
+                  <div class="empty-state">
+                    <i class="bi bi-folder2-open"></i>
+                    <h4>No se encontraron categorías</h4>
+                    <p>No hay categorías que coincidan con tu búsqueda</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
-
   </section>
 </div>

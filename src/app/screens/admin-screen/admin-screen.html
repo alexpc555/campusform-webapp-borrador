@@ -1,83 +1,201 @@
-<div class="landing-root">
-  <!-- Navbar (igual estilo landing) -->
-  <nav class="navbar navbar-expand-lg navbar-glass sticky-top border-bottom">
-    <div class="container py-2 position-relative">
-      <a class="navbar-brand d-flex align-items-center gap-2" routerLink="/">
-        <span class="brand-icon">
+<div class="admin-root">
+  <!-- Navbar -->
+  <nav class="navbar-glass">
+    <div class="navbar-container">
+      <a class="brand-wrapper" routerLink="/">
+        <div class="brand-icon">
           <i class="bi bi-mortarboard-fill"></i>
-        </span>
+        </div>
         <span class="brand-name">CampusForum</span>
       </a>
 
-      <div class="ms-auto d-flex align-items-center gap-2">
-  <span class="badge badge-soft d-none d-md-inline">Admin</span>
+      <div class="navbar-actions">
+        <span class="role-badge">
+          <i class="bi bi-shield-shaded"></i>
+          Administrador
+        </span>
 
-  <button class="btn btn-outline-primary" (click)="irAlDashboard()">
-    <i class="bi bi-chat-dots me-1"></i>
-    Ir al dashboard
-  </button>
+        <button class="btn-dashboard" (click)="irAlDashboard()">
+          <i class="bi bi-grid-3x3-gap-fill"></i>
+          <span>Dashboard</span>
+        </button>
 
-  <button class="btn btn-outline-danger" (click)="salir()">
-    Salir
-  </button>
-</div>
-      
+        <button class="btn-logout" (click)="salir()">
+          <i class="bi bi-box-arrow-right"></i>
+          <span>Salir</span>
+        </button>
+      </div>
     </div>
   </nav>
 
-  <section class="container py-5">
-    <div class="mb-4">
-      <h1 class="section-title mb-2">Home de Administrador</h1>
-      <p class="section-subtitle mb-0">Elige qué quieres administrar</p>
+  <!-- Header Section -->
+  <section class="header-section">
+    <div class="container">
+      <div class="header-content fade-in-up">
+        <div class="header-icon">
+          <i class="bi bi-shield-check"></i>
+        </div>
+        <div class="header-text">
+          <h1 class="header-title">Panel de Administración</h1>
+          <p class="header-subtitle">Gestiona usuarios, categorías, reportes y analíticas del sistema</p>
+        </div>
+      </div>
     </div>
+  </section>
 
-   <div class="row g-4">
-  <div class="col-md-4">
-    <a class="text-decoration-none" routerLink="/admin/usuarios">
-      <div class="glass-card p-4 h-100 hover-lift admin-card">
-        <div class="feature-icon mb-3">
-          <i class="bi bi-people"></i>
-        </div>
-        <h3 class="feature-title">Gestión de usuarios</h3>
-        <p class="feature-text mb-0">Roles, suspender, eliminar</p>
+  <!-- Cards Section -->
+  <section class="cards-section">
+    <div class="container">
+      <div class="section-header fade-in-up delay-1">
+        <span class="section-badge">
+          <i class="bi bi-gear-fill"></i>
+          Herramientas de gestión
+        </span>
+        <h2 class="section-title">¿Qué deseas administrar?</h2>
+        <p class="section-subtitle">Selecciona una opción para comenzar a gestionar</p>
       </div>
-    </a>
-  </div>
 
-  <div class="col-md-4">
-    <a class="text-decoration-none" routerLink="/admin/categorias">
-      <div class="glass-card p-4 h-100 hover-lift admin-card">
-        <div class="feature-icon feature-icon-secondary mb-3">
-          <i class="bi bi-tags"></i>
-        </div>
-        <h3 class="feature-title">Categorías</h3>
-        <p class="feature-text mb-0">Crear / editar / eliminar</p>
-      </div>
-    </a>
-  </div>
+      <div class="cards-grid">
+        <!-- Gestión de Usuarios -->
+        <a class="admin-card fade-in-up delay-1" routerLink="/admin/usuarios">
+          <div class="card-content">
+            <div class="card-icon-wrapper blue">
+              <div class="card-icon">
+                <i class="bi bi-people-fill"></i>
+              </div>
+            </div>
+            <div class="card-info">
+              <h3 class="card-title">Gestión de Usuarios</h3>
+              <p class="card-description">Administra estudiantes, profesores y administradores</p>
+              <div class="card-features">
+                <span class="feature-tag">
+                  <i class="bi bi-person-plus"></i>
+                  Crear
+                </span>
+                <span class="feature-tag">
+                  <i class="bi bi-pencil"></i>
+                  Editar
+                </span>
+                <span class="feature-tag">
+                  <i class="bi bi-person-x"></i>
+                  Suspender
+                </span>
+                <span class="feature-tag">
+                  <i class="bi bi-trash"></i>
+                  Eliminar
+                </span>
+              </div>
+            </div>
+            <div class="card-arrow">
+              <i class="bi bi-arrow-right"></i>
+            </div>
+          </div>
+          <div class="card-shine"></div>
+        </a>
 
-  <div class="col-md-4">
-    <a class="text-decoration-none" routerLink="/admin/reportes">
-      <div class="glass-card p-4 h-100 hover-lift admin-card">
-        <div class="feature-icon mb-3">
-          <i class="bi bi-flag"></i>
-        </div>
-        <h3 class="feature-title">Reportes</h3>
-        <p class="feature-text mb-0">Revisar, resolver, desestimar</p>
+        <!-- Categorías -->
+        <a class="admin-card fade-in-up delay-2" routerLink="/admin/categorias">
+          <div class="card-content">
+            <div class="card-icon-wrapper green">
+              <div class="card-icon">
+                <i class="bi bi-tags-fill"></i>
+              </div>
+            </div>
+            <div class="card-info">
+              <h3 class="card-title">Categorías</h3>
+              <p class="card-description">Organiza el contenido con categorías personalizadas</p>
+              <div class="card-features">
+                <span class="feature-tag">
+                  <i class="bi bi-plus-circle"></i>
+                  Crear
+                </span>
+                <span class="feature-tag">
+                  <i class="bi bi-pencil"></i>
+                  Editar
+                </span>
+                <span class="feature-tag">
+                  <i class="bi bi-archive"></i>
+                  Archivar
+                </span>
+              </div>
+            </div>
+            <div class="card-arrow">
+              <i class="bi bi-arrow-right"></i>
+            </div>
+          </div>
+          <div class="card-shine"></div>
+        </a>
+
+        <!-- Reportes -->
+        <a class="admin-card fade-in-up delay-3" routerLink="/admin/reportes">
+          <div class="card-content">
+            <div class="card-icon-wrapper red">
+              <div class="card-icon">
+                <i class="bi bi-flag-fill"></i>
+              </div>
+            </div>
+            <div class="card-info">
+              <h3 class="card-title">Reportes</h3>
+              <p class="card-description">Revisa y gestiona los reportes de la comunidad</p>
+              <div class="card-features">
+                <span class="feature-tag">
+                  <i class="bi bi-eye"></i>
+                  Revisar
+                </span>
+                <span class="feature-tag">
+                  <i class="bi bi-check-circle"></i>
+                  Resolver
+                </span>
+                <span class="feature-tag">
+                  <i class="bi bi-x-circle"></i>
+                  Desestimar
+                </span>
+                <span class="feature-tag">
+                  <i class="bi bi-filter"></i>
+                  Filtrar
+                </span>
+              </div>
+            </div>
+            <div class="card-arrow">
+              <i class="bi bi-arrow-right"></i>
+            </div>
+          </div>
+          <div class="card-shine"></div>
+        </a>
+
+        <!-- Analytics -->
+        <a class="admin-card fade-in-up delay-4" routerLink="/analytics-page">
+          <div class="card-content">
+            <div class="card-icon-wrapper purple">
+              <div class="card-icon">
+                <i class="bi bi-bar-chart-fill"></i>
+              </div>
+            </div>
+            <div class="card-info">
+              <h3 class="card-title">Analytics</h3>
+              <p class="card-description">Visualiza métricas y estadísticas del sistema</p>
+              <div class="card-features">
+                <span class="feature-tag">
+                  <i class="bi bi-graph-up"></i>
+                  Métricas
+                </span>
+                <span class="feature-tag">
+                  <i class="bi bi-pie-chart"></i>
+                  Gráficas
+                </span>
+                <span class="feature-tag">
+                  <i class="bi bi-download"></i>
+                  Exportar
+                </span>
+              </div>
+            </div>
+            <div class="card-arrow">
+              <i class="bi bi-arrow-right"></i>
+            </div>
+          </div>
+          <div class="card-shine"></div>
+        </a>
       </div>
-    </a>
-  </div>
-</div>
-<div class="col-md-4">
-  <a class="text-decoration-none" routerLink="/analytics-page">
-    <div class="glass-card p-4 h-100 hover-lift admin-card">
-      <div class="feature-icon feature-icon-secondary mb-3">
-        <i class="bi bi-bar-chart-line"></i>
-      </div>
-      <h3 class="feature-title">Analytics</h3>
-      <p class="feature-text mb-0">Ver métricas y estadísticas del sistema</p>
     </div>
-  </a>
-</div>
   </section>
 </div>
