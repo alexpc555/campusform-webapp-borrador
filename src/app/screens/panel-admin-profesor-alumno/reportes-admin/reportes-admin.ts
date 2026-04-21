@@ -65,10 +65,10 @@ export class ReportesAdmin implements OnInit {
 
       const matchesText =
         !q ||
-        r.post_titulo.toLowerCase().includes(q) ||
-        r.motivo.toLowerCase().includes(q) ||
-        r.razon.toLowerCase().includes(q) ||
-        r.autor_nombre.toLowerCase().includes(q);
+        (r.post_titulo || '').toLowerCase().includes(q) ||
+        (r.motivo || '').toLowerCase().includes(q) ||
+        (r.razon || '').toLowerCase().includes(q) ||
+        (r.autor_nombre || '').toLowerCase().includes(q);
 
       return matchesStatus && matchesText;
     });
@@ -114,7 +114,6 @@ export class ReportesAdmin implements OnInit {
     this.reportService.deleteReport(report.id).subscribe({
       next: () => {
         this.reports = this.reports.filter(r => r.id !== report.id);
-
         if (this.selected?.id === report.id) {
           this.closeDetails();
         }
@@ -137,7 +136,6 @@ export class ReportesAdmin implements OnInit {
     this.reportService.updateReport(report.id, payload).subscribe({
       next: (updated) => {
         this.reports = this.reports.map(r => r.id === updated.id ? updated : r);
-
         if (this.selected?.id === updated.id) {
           this.selected = updated;
         }
@@ -147,5 +145,43 @@ export class ReportesAdmin implements OnInit {
         alert('No se pudo actualizar el estado del reporte.');
       }
     });
+  }
+
+  // Métodos adicionales para el template
+  getStatusName(estado: string): string {
+    const status = estado?.toLowerCase() || '';
+    if (status.includes('pendiente')) return 'Pendiente';
+    if (status.includes('revisado')) return 'Revisado';
+    if (status.includes('resuelto')) return 'Resuelto';
+    return 'Pendiente';
+  }
+
+  getStatusIcon(estado: string): string {
+    const status = estado?.toLowerCase() || '';
+    if (status.includes('pendiente')) return 'bi-clock-fill';
+    if (status.includes('revisado')) return 'bi-eye-fill';
+    if (status.includes('resuelto')) return 'bi-check-circle-fill';
+    return 'bi-clock-fill';
+  }
+
+  getStatusBadgeClass(estado: string): string {
+    const status = estado?.toLowerCase() || '';
+    if (status.includes('pendiente')) return 'pendiente';
+    if (status.includes('revisado')) return 'revisado';
+    if (status.includes('resuelto')) return 'resuelto';
+    return 'pendiente';
+  }
+
+  getMotivoName(motivo: string): string {
+    const motivos: { [key: string]: string } = {
+      'spam': 'Spam o contenido engañoso',
+      'contenido_inapropiado': 'Contenido inapropiado',
+      'acoso': 'Acoso o intimidación',
+      'lenguaje_ofensivo': 'Lenguaje ofensivo',
+      'informacion_falsa': 'Información falsa',
+      'derechos_autor': 'Violación de derechos de autor',
+      'otro': 'Otro'
+    };
+    return motivos[motivo] || motivo;
   }
 }

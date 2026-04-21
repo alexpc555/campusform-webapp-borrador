@@ -64,11 +64,11 @@ export class PostService {
   getMyPosts(): Observable<Post[]> {
     const url = `${this.apiUrl}/posts/mis-posts/`;
     const headers = this.authHeaders();
-    console.log('🔐 Headers enviados a mis-posts:', headers);
-    console.log('🔑 Token:', this.auth.getToken());
+    console.log(' Headers enviados a mis-posts:', headers);
+    console.log(' Token:', this.auth.getToken());
     return this.http.get<Post[]>(url, { headers }).pipe(
       catchError(error => {
-        console.error('❌ Error en getMyPosts:', error);
+        console.error(' Error en getMyPosts:', error);
         return throwError(() => error);
       })
     );

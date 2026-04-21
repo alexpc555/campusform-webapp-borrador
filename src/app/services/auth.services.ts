@@ -46,8 +46,8 @@ export class AuthService {
       'Content-Type': 'application/json',
     });
     
-    console.log('📤 Enviando registro a:', `${this.apiUrl}/auth/register/`);
-    console.log('📦 Payload:', payload);
+    console.log(' Enviando registro a:', `${this.apiUrl}/auth/register/`);
+    console.log(' Payload:', payload);
     
     return this.http.post(`${this.apiUrl}/auth/register/`, payload, { headers });
   }
@@ -65,8 +65,8 @@ export class AuthService {
           localStorage.setItem('refresh', response.refresh);
           localStorage.setItem('user', JSON.stringify(response.user));
           
-          console.log('✅ Usuario autenticado:', response.user);
-          console.log('📌 Rol:', response.user.role);
+          console.log(' Usuario autenticado:', response.user);
+          console.log(' Rol:', response.user.role);
           
           // Redirigir según el rol
           const redirectMap: { [key: string]: string } = {
@@ -76,7 +76,7 @@ export class AuthService {
           };
           
           const redirectPath = redirectMap[response.user.role];
-          console.log('🔄 Redirigiendo a:', redirectPath);
+          console.log(' Redirigiendo a:', redirectPath);
           this.router.navigate([redirectPath]);
         }
       })

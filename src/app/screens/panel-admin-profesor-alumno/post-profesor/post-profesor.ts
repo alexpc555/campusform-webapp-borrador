@@ -113,11 +113,11 @@ export class PostProfesor implements OnInit {
     this.postService.deletePost(post.id).subscribe({
       next: () => {
         this.posts = this.posts.filter(p => p.id !== post.id);
-        alert('✅ Publicación eliminada correctamente');
+        alert(' Publicación eliminada correctamente');
       },
       error: (err) => {
         console.error('Error eliminando post:', err);
-        alert('❌ Error al eliminar la publicación');
+        alert(' Error al eliminar la publicación');
       }
     });
   }

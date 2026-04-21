@@ -13,6 +13,6 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes), 
     provideNgxMask(),
-    provideHttpClient(withInterceptors([authInterceptor])) // 👈 AQUÍ
+    provideHttpClient(withInterceptors([authInterceptor])) 
   ]
 };

@@ -63,7 +63,7 @@ export class UserService {
         }));
       }),
       catchError(error => {
-        console.error('❌ Error en getAllUsers:', error);
+        console.error(' Error en getAllUsers:', error);
         return throwError(() => error);
       })
     );
@@ -83,7 +83,7 @@ export class UserService {
         fecha_registro: user.fecha_registro
       })),
       catchError(error => {
-        console.error('❌ Error en getUser:', error);
+        console.error(' Error en getUser:', error);
         return throwError(() => error);
       })
     );
@@ -92,11 +92,11 @@ export class UserService {
   /** Crea un nuevo usuario (solo admin) */
   createUser(payload: CreateUserPayload): Observable<User> {
     const url = `${this.apiUrl}/usuarios/`;
-    console.log('📡 POST crear usuario:', url);
+    console.log(' POST crear usuario:', url);
 
     const token = this.auth.getToken();
     if (!token) {
-      console.error('❌ No hay token en localStorage/sessionStorage');
+      console.error(' No hay token en localStorage/sessionStorage');
       return throwError(() => new Error('No hay token de autenticación'));
     }
 
@@ -109,7 +109,7 @@ export class UserService {
         fecha_registro: user.fecha_registro || new Date().toISOString()
       })),
       catchError(error => {
-        console.error('❌ Error en createUser:', error);
+        console.error(' Error en createUser:', error);
         return throwError(() => error);
       })
     );
@@ -118,7 +118,7 @@ export class UserService {
   /** Actualiza un usuario (solo admin) */
   updateUser(id: number, payload: Partial<CreateUserPayload>): Observable<User> {
     const url = `${this.apiUrl}/usuarios/${id}/`;
-    console.log('📡 PUT actualizar usuario:', url);
+    console.log(' PUT actualizar usuario:', url);
 
     const token = this.auth.getToken();
     if (!token) {
@@ -134,7 +134,7 @@ export class UserService {
         fecha_registro: user.fecha_registro
       })),
       catchError(error => {
-        console.error('❌ Error en updateUser:', error);
+        console.error(' Error en updateUser:', error);
         return throwError(() => error);
       })
     );
@@ -152,7 +152,7 @@ export class UserService {
 
     return this.http.delete<void>(url, { headers: this.authHeaders() }).pipe(
       catchError(error => {
-        console.error('❌ Error en deleteUser:', error);
+        console.error(' Error en deleteUser:', error);
         return throwError(() => error);
       })
     );

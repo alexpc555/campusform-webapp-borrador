@@ -1,142 +1,269 @@
-<nav class="navbar navbar-expand-lg navbar-glass sticky-top border-bottom">
-  <div class="container py-2 position-relative">
-    <a class="navbar-brand d-flex align-items-center gap-2">
-      <span class="brand-icon">
-        <i class="bi bi-mortarboard-fill"></i>
-      </span>
-      <span class="brand-name">CampusForum</span>
-    </a>
+<div class="reportes-root">
+  <!-- Navbar -->
+  <nav class="navbar-glass">
+    <div class="navbar-container">
+      <a class="brand-wrapper" routerLink="/admin">
+        <div class="brand-icon">
+          <i class="bi bi-mortarboard-fill"></i>
+        </div>
+        <span class="brand-name">CampusForum</span>
+      </a>
 
-    <div class="ms-auto d-flex align-items-center gap-2">
-      <span class="badge badge-soft d-none d-md-inline">
-        Admin • Reportes • Pendientes: {{ pendingCount }}
-      </span>
-      <button class="btn btn-outline-primary" (click)="volver()">Volver</button>
+      <div class="navbar-actions">
+        <span class="page-badge">
+          <i class="bi bi-flag-fill"></i>
+          Gestión de Reportes
+        </span>
+
+        <span class="pending-badge" *ngIf="pendingCount > 0">
+          <i class="bi bi-clock-fill"></i>
+          {{ pendingCount }} pendiente{{ pendingCount !== 1 ? 's' : '' }}
+        </span>
+
+        <button class="btn-back" (click)="volver()">
+          <i class="bi bi-arrow-left"></i>
+          <span>Volver</span>
+        </button>
+      </div>
     </div>
-  </div>
-</nav>
+  </nav>
 
-<section class="container py-5">
-  <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 mb-4">
-    <div>
-      <h1 class="section-title mb-2">Reportes y Moderación</h1>
-      <p class="section-subtitle mb-0">
-        Filtra, revisa y toma acciones sobre contenido reportado
-      </p>
+  <!-- Header Section -->
+  <section class="header-section">
+    <div class="container">
+      <div class="header-content fade-in-up">
+        <div class="header-icon">
+          <i class="bi bi-shield-shaded"></i>
+        </div>
+        <div class="header-text">
+          <h1 class="header-title">Reportes y Moderación</h1>
+          <p class="header-subtitle">Revisa, filtra y toma acciones sobre el contenido reportado</p>
+        </div>
+      </div>
     </div>
+  </section>
 
-    <div class="d-flex gap-2 align-items-center flex-wrap">
-      <input
-        class="form-control form-control-sm search-input"
-        placeholder="Buscar reporte..."
-        [(ngModel)]="search"
-      />
+  <!-- Main Content -->
+  <section class="content-section">
+    <div class="container">
+      <!-- Filters Bar -->
+      <div class="filters-bar fade-in-up delay-1">
+        <div class="search-wrapper">
+          <i class="bi bi-search search-icon"></i>
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Buscar por título, motivo o autor..."
+            [(ngModel)]="search"
+          />
+        </div>
 
-      <select class="form-select form-select-sm" [(ngModel)]="statusFilter">
-        <option value="all">Todos</option>
-        <option value="pendiente">Pendientes</option>
-        <option value="revisado">Revisados</option>
-        <option value="resuelto">Resueltos</option>
-      </select>
-    </div>
-  </div>
-
-  <div *ngIf="loading" class="text-center py-5">
-    <div class="spinner-border text-primary mb-3" role="status">
-      <span class="visually-hidden">Cargando...</span>
-    </div>
-    <p class="text-muted">Cargando reportes...</p>
-  </div>
-
-  <div *ngIf="errorMessage" class="alert alert-danger">
-    {{ errorMessage }}
-  </div>
-
-  <div class="glass-card p-3 p-md-4" *ngIf="!loading">
-    <div class="post-card mb-3" *ngFor="let r of filteredReports">
-      <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
-        <div>
-          <div class="d-flex gap-2 flex-wrap align-items-center mb-2">
-            <span class="badge badge-soft">Reporte</span>
-            <span class="badge" [ngClass]="statusClass(r.estado)">
-              {{ statusLabel(r.estado) }}
-            </span>
+        <div class="filters-actions">
+          <div class="status-filter-wrapper">
+            <i class="bi bi-funnel-fill filter-icon"></i>
+            <select class="status-select" [(ngModel)]="statusFilter">
+              <option value="all">Todos los estados</option>
+              <option value="pendiente">Pendientes</option>
+              <option value="revisado">Revisados</option>
+              <option value="resuelto">Resueltos</option>
+            </select>
           </div>
 
-          <h5 class="mb-1">{{ r.post_titulo }}</h5>
-          <p class="text-muted mb-2">
-            Reportado por: {{ r.autor_nombre }} • {{ r.fecha_creacion | date:'short' }}
-          </p>
-          <p class="mb-1"><strong>Motivo:</strong> {{ r.motivo }}</p>
-          <p class="mb-0">{{ r.razon }}</p>
+          <div class="results-count">
+            <i class="bi bi-flag"></i>
+            {{ filteredReports.length }} reporte{{ filteredReports.length !== 1 ? 's' : '' }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div class="loading-state fade-in-up delay-1" *ngIf="loading">
+        <div class="loading-spinner">
+          <div class="spinner-blue"></div>
+        </div>
+        <p class="loading-text">Cargando reportes...</p>
+      </div>
+
+      <!-- Error Message -->
+      <div class="alert-error fade-in-up delay-1" *ngIf="errorMessage && !loading">
+        <i class="bi bi-exclamation-circle-fill"></i>
+        <span>{{ errorMessage }}</span>
+        <button class="retry-btn" (click)="loadReports()">
+          <i class="bi bi-arrow-repeat"></i>
+          Reintentar
+        </button>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state fade-in-up delay-1" *ngIf="!loading && !errorMessage && filteredReports.length === 0">
+        <div class="empty-icon-wrapper">
+          <i class="bi bi-check-circle"></i>
+        </div>
+        <h3 class="empty-title">No hay reportes</h3>
+        <p class="empty-text">No se encontraron reportes con los filtros seleccionados</p>
+      </div>
+
+      <!-- Reports Grid -->
+      <div class="reports-grid fade-in-up delay-1" *ngIf="!loading && !errorMessage && filteredReports.length > 0">
+        <div class="report-card" *ngFor="let r of filteredReports" [class]="'status-' + r.estado">
+          <div class="report-header">
+            <div class="report-status-indicator" [class]="'status-' + r.estado"></div>
+            <div class="report-header-content">
+              <div class="report-title-row">
+                <h3 class="report-title">{{ r.post_titulo }}</h3>
+                <span class="status-badge" [class]="getStatusBadgeClass(r.estado)">
+                  <i class="bi" [class]="getStatusIcon(r.estado)"></i>
+                  {{ getStatusName(r.estado) }}
+                </span>
+              </div>
+              <div class="report-meta">
+                <span class="meta-item">
+                  <i class="bi bi-person-circle"></i>
+                  Reportado por: {{ r.autor_nombre || 'Anónimo' }}
+                </span>
+                <span class="meta-item">
+                  <i class="bi bi-calendar"></i>
+                  {{ r.fecha_creacion | date:'dd/MM/yyyy' }}
+                </span>
+                <span class="meta-item">
+                  <i class="bi bi-clock"></i>
+                  {{ r.fecha_creacion | date:'HH:mm' }}
+                </span>
+                <span class="meta-item">
+                  <i class="bi bi-hash"></i>
+                  ID: #{{ r.id }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="report-body">
+            <div class="report-section">
+              <div class="section-label">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                Motivo del reporte
+              </div>
+              <p class="report-reason">{{ getMotivoName(r.motivo) }}</p>
+            </div>
+
+            <div class="report-section">
+              <div class="section-label">
+                <i class="bi bi-chat-text-fill"></i>
+                Descripción
+              </div>
+              <div class="reason-content">
+                <i class="bi bi-quote quote-icon"></i>
+                <p class="report-description">{{ r.razon }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="report-actions">
+            <button class="action-btn details-btn" (click)="openDetails(r)">
+              <i class="bi bi-eye-fill"></i>
+              <span>Ver detalles</span>
+            </button>
+            <button class="action-btn review-btn" (click)="marcarRevisado(r)" *ngIf="r.estado === 'pendiente'">
+              <i class="bi bi-check-circle"></i>
+              <span>Marcar revisado</span>
+            </button>
+            <button class="action-btn resolve-btn" (click)="resolver(r)" *ngIf="r.estado !== 'resuelto'">
+              <i class="bi bi-check-circle-fill"></i>
+              <span>Resolver</span>
+            </button>
+            <button class="action-btn reopen-btn" (click)="reabrir(r)" *ngIf="r.estado === 'resuelto'">
+              <i class="bi bi-arrow-repeat"></i>
+              <span>Reabrir</span>
+            </button>
+            <button class="action-btn delete-btn" (click)="eliminar(r)">
+              <i class="bi bi-trash3-fill"></i>
+              <span>Eliminar</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- Modal de detalles -->
+<div class="modal-overlay" *ngIf="showDetails && selected" (click)="closeDetails()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title-wrapper">
+        <div class="modal-icon" [class]="'status-' + selected.estado">
+          <i class="bi bi-flag-fill"></i>
+        </div>
+        <div class="modal-title-text">
+          <h2>Detalle del Reporte</h2>
+          <p>ID: #{{ selected.id }}</p>
+        </div>
+      </div>
+      <button class="modal-close" (click)="closeDetails()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="detail-section">
+        <div class="detail-header">
+          <span class="status-badge large" [class]="getStatusBadgeClass(selected.estado)">
+            <i class="bi" [class]="getStatusIcon(selected.estado)"></i>
+            {{ getStatusName(selected.estado) }}
+          </span>
         </div>
 
-        <div class="d-flex flex-column gap-2 align-items-lg-end">
-          <button class="btn btn-outline-secondary btn-sm" (click)="openDetails(r)">
-            Ver detalles
-          </button>
+        <h3 class="detail-post-title">{{ selected.post_titulo }}</h3>
 
-          <button class="btn btn-outline-warning btn-sm" (click)="marcarRevisado(r)">
-            Marcar revisado
-          </button>
+        <div class="detail-meta">
+          <div class="meta-row">
+            <i class="bi bi-person"></i>
+            <span>Reportado por: {{ selected.autor_nombre || 'Anónimo' }}</span>
+          </div>
+          <div class="meta-row">
+            <i class="bi bi-calendar"></i>
+            <span>Fecha: {{ selected.fecha_creacion | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+        </div>
 
-          <button class="btn btn-outline-success btn-sm" (click)="resolver(r)">
-            Resolver
-          </button>
+        <div class="detail-box">
+          <div class="detail-label">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            Motivo
+          </div>
+          <p class="detail-value">{{ getMotivoName(selected.motivo) }}</p>
+        </div>
 
-          <button class="btn btn-outline-primary btn-sm" (click)="reabrir(r)">
-            Reabrir
-          </button>
-
-          <button class="btn btn-outline-danger btn-sm" (click)="eliminar(r)">
-            Eliminar
-          </button>
+        <div class="detail-box">
+          <div class="detail-label">
+            <i class="bi bi-chat-text-fill"></i>
+            Descripción
+          </div>
+          <p class="detail-value description">{{ selected.razon }}</p>
         </div>
       </div>
     </div>
 
-    <div *ngIf="filteredReports.length === 0" class="text-center text-muted py-4">
-      No hay reportes con esos filtros.
-    </div>
-  </div>
-</section>
-
-<div class="modal-backdrop-custom" *ngIf="showDetails && selected">
-  <div class="modal-card-custom">
-    <div class="d-flex justify-content-between align-items-start mb-3">
-      <div>
-        <h4 class="mb-1">Detalle del reporte</h4>
-        <p class="text-muted mb-0">ID: {{ selected.id }}</p>
-      </div>
-      <button class="btn btn-sm btn-outline-secondary" (click)="closeDetails()">Cerrar</button>
-    </div>
-
-    <div class="mb-3">
-      <span class="badge" [ngClass]="statusClass(selected.estado)">
-        {{ statusLabel(selected.estado) }}
-      </span>
-    </div>
-
-    <h5>{{ selected.post_titulo }}</h5>
-    <p class="text-muted">
-      Reportado por: {{ selected.autor_nombre }} • {{ selected.fecha_creacion | date:'short' }}
-    </p>
-
-    <p><strong>Motivo:</strong> {{ selected.motivo }}</p>
-    <p>{{ selected.razon }}</p>
-
-    <div class="d-flex gap-2 flex-wrap mt-4">
-      <button class="btn btn-outline-warning btn-sm" (click)="marcarRevisado(selected)">
+    <div class="modal-footer">
+      <button class="modal-btn review" (click)="marcarRevisado(selected)" *ngIf="selected.estado === 'pendiente'">
+        <i class="bi bi-check-circle"></i>
         Marcar revisado
       </button>
-      <button class="btn btn-outline-success btn-sm" (click)="resolver(selected)">
+      <button class="modal-btn resolve" (click)="resolver(selected)" *ngIf="selected.estado !== 'resuelto'">
+        <i class="bi bi-check-circle-fill"></i>
         Resolver
       </button>
-      <button class="btn btn-outline-primary btn-sm" (click)="reabrir(selected)">
+      <button class="modal-btn reopen" (click)="reabrir(selected)" *ngIf="selected.estado === 'resuelto'">
+        <i class="bi bi-arrow-repeat"></i>
         Reabrir
       </button>
-      <button class="btn btn-outline-danger btn-sm" (click)="eliminar(selected)">
+      <button class="modal-btn delete" (click)="eliminar(selected); closeDetails()">
+        <i class="bi bi-trash3-fill"></i>
         Eliminar
+      </button>
+      <button class="modal-btn cancel" (click)="closeDetails()">
+        <i class="bi bi-x-lg"></i>
+        Cerrar
       </button>
     </div>
   </div>

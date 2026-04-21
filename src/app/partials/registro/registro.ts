@@ -191,11 +191,11 @@ export class Registro implements OnInit {
       role: this.form.value.role as Role,
     };
 
-    console.log('📤 Enviando registro:', payload);
+    console.log(' Enviando registro:', payload);
 
     this.auth.register(payload).subscribe({
       next: (response) => {
-        console.log('✅ Registro exitoso:', response);
+        console.log(' Registro exitoso:', response);
         this.submitting = false;
         this.registerSuccess = true;
         
@@ -206,7 +206,7 @@ export class Registro implements OnInit {
       },
       error: (err) => {
         this.submitting = false;
-        console.error('❌ Error en registro:', err);
+        console.error(' Error en registro:', err);
         
         if (err.status === 400) {
           const errorData = err.error;
