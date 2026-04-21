@@ -55,10 +55,11 @@ export const routes: Routes = [
 
   // Analytics
   {
-    path: 'analytics-page',
-    component: AnalyticsPageComponent,
-    canActivate: [authGuard]
-  },
+  path: 'analytics-page',
+  component: AnalyticsPageComponent,
+  canActivate: [authGuard, roleGuard],
+  data: { roles: ['admin', 'teacher'] }
+},
 
   // Dashboard principal
   {

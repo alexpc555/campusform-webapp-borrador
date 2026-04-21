@@ -7,14 +7,20 @@ export const roleGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
   const router = inject(Router);
 
   const user = auth.getCurrentUser();
+
   const expectedRole = route.data['role'];
+  const expectedRoles = route.data['roles'] as string[] | undefined;
 
   if (!user) {
     router.navigate(['/login']);
     return false;
   }
 
-  if (user.role === expectedRole) {
+  if (expectedRoles && expectedRoles.includes(user.role)) {
+    return true;
+  }
+
+  if (expectedRole && user.role === expectedRole) {
     return true;
   }
 
@@ -29,7 +35,7 @@ export const roleGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
   }
 
   if (user.role === 'student') {
-    router.navigate(['/dashboard']);
+    router.navigate(['/student-panel']);
     return false;
   }
 

@@ -1,172 +1,178 @@
 <div class="analytics-root">
-
   <!-- Navbar -->
-  <nav class="navbar-glass">
-    <div class="container d-flex justify-content-between align-items-center">
-
-      <a routerLink="/dashboard" class="brand">
-        <div class="brand-icon">
+  <nav class="navbar navbar-expand-lg navbar-glass sticky-top border-bottom">
+    <div class="container py-2 position-relative">
+      <a class="navbar-brand d-flex align-items-center gap-2" routerLink="/">
+        <span class="brand-icon">
           <i class="bi bi-mortarboard-fill"></i>
-        </div>
+        </span>
         <span class="brand-text">CampusForum</span>
       </a>
-<div class="d-flex gap-2">
 
-  <a routerLink="/Profesor" class="btn btn-outline-primary">
-    Panel Profesor
-  </a>
+      <div class="ms-auto d-flex align-items-center gap-2">
+        <button class="btn btn-outline-primary rounded-pill px-3" (click)="volver()">
+  <i class="bi bi-arrow-left me-1"></i>
+  {{ getTextoVolver() }}
+</button>
+      </div>
+    </div>
+  </nav>
 
-  <a routerLink="/" class="btn btn-light icon-btn" aria-label="Configuración">
-    <i class="bi bi-gear"></i>
-  </a>
-
-  <a routerLink="/" class="btn btn-light icon-btn" aria-label="Cerrar sesión">
-    <i class="bi bi-box-arrow-right"></i>
-  </a>
-
-</div>
-
-</div>
-</nav>
-  <!-- Content -->
-  <div class="container py-4">
-
-    <!-- Header -->
-    <div class="mb-4">
-
-      <h1 class="page-title">
-        Analytics Dashboard
-      </h1>
-
-      <p class="page-subtitle">
-        Métricas y estadísticas de la plataforma CampusForum
+  <section class="container py-5">
+    <div class="glass-card p-4 p-md-5 mb-4 hero-block">
+      <span class="badge-soft mb-3 d-inline-flex">Panel de estadísticas</span>
+      <h1 class="page-title mb-2">Analytics Dashboard</h1>
+      <p class="page-subtitle mb-0">
+        Consulta métricas clave, actividad general y publicaciones por categoría.
       </p>
-
     </div>
 
+    <div *ngIf="loading" class="glass-card p-4 text-center">
+      <div class="spinner-border text-primary mb-3" role="status"></div>
+      <p class="mb-0">Cargando estadísticas...</p>
+    </div>
 
-    <!-- Stats -->
-    <div class="row g-4 mb-4">
+    <div *ngIf="error" class="glass-card p-4 text-center error-card">
+      <i class="bi bi-exclamation-triangle-fill error-icon"></i>
+      <p class="mb-0 mt-2">{{ error }}</p>
+    </div>
 
-      <div class="col-md-3" *ngFor="let stat of stats">
-
-        <div class="glass-card p-3">
-
-          <div class="d-flex justify-content-between align-items-center">
-
-            <div>
-
-              <div class="stat-label">
-                {{stat.label}}
+    <ng-container *ngIf="!loading && !error">
+      <!-- Cards resumen -->
+      <div class="row g-4 mb-4">
+        <div class="col-md-6 col-xl-3" *ngFor="let stat of stats">
+          <div class="glass-card stat-card p-4 h-100 shadow-sm">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <div class="stat-label">{{ stat.label }}</div>
+                <div class="stat-value">{{ stat.value }}</div>
               </div>
-
-              <div class="stat-value">
-                {{stat.value}}
+              <div class="stat-icon-wrap">
+                <i [class]="stat.icon + ' stat-icon'"></i>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-              <div class="stat-growth text-success">
-                {{stat.growth}}
-              </div>
-
+      <!-- Sección principal -->
+      <div class="row g-4">
+        <!-- Gráfica -->
+        <div class="col-lg-8">
+          <div class="glass-card p-4 h-100 shadow-sm">
+            <div class="section-head">
+              <h3 class="section-title mb-1">Publicaciones por categoría</h3>
+              <p class="section-subtitle mb-0">
+                Distribución actual de publicaciones registradas.
+              </p>
             </div>
 
-            <div class="stat-icon">
-              <i class="{{stat.icon}}"></i>
+            <div *ngIf="postsPerCategory.length > 0" class="chart-wrap mt-4">
+              <div class="chart">
+                <div class="bar-container" *ngFor="let item of postsPerCategory">
+                  <div
+                    class="bar"
+                    [style.height.px]="item.posts * 28">
+                  </div>
+                  <div class="bar-value">{{ item.posts }}</div>
+                  <div class="bar-label">{{ item.name }}</div>
+                </div>
+              </div>
             </div>
 
+            <div *ngIf="postsPerCategory.length === 0" class="empty-state">
+              <i class="bi bi-bar-chart-line empty-icon"></i>
+              <p class="mb-0">Aún no hay categorías con publicaciones para mostrar.</p>
+            </div>
           </div>
-
         </div>
 
+        <!-- Resumen lateral -->
+        <div class="col-lg-4">
+          <div class="glass-card p-4 h-100 shadow-sm">
+            <div class="section-head">
+              <h3 class="section-title mb-1">Resumen general</h3>
+              <p class="section-subtitle mb-0">
+                Indicadores principales del sistema.
+              </p>
+            </div>
+
+            <div class="metrics-list mt-4">
+              <div class="metric-row">
+                <div>
+                  <div class="metric-label">Usuarios registrados</div>
+                  <div class="metric-value">{{ stats[0]?.value }}</div>
+                </div>
+                <i class="bi bi-people metric-icon"></i>
+              </div>
+
+              <div class="metric-row">
+                <div>
+                  <div class="metric-label">Publicaciones totales</div>
+                  <div class="metric-value">{{ stats[1]?.value }}</div>
+                </div>
+                <i class="bi bi-file-earmark-text metric-icon"></i>
+              </div>
+
+              <div class="metric-row">
+                <div>
+                  <div class="metric-label">Comentarios totales</div>
+                  <div class="metric-value">{{ stats[2]?.value }}</div>
+                </div>
+                <i class="bi bi-chat-left-text metric-icon"></i>
+              </div>
+
+              <div class="metric-row">
+                <div>
+                  <div class="metric-label">Promedio por publicación</div>
+                  <div class="metric-value">{{ stats[3]?.value }}</div>
+                </div>
+                <i class="bi bi-graph-up metric-icon"></i>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-    </div>
+      <!-- Lista inferior -->
+      <div class="row g-4 mt-1">
+        <div class="col-12">
+          <div class="glass-card p-4 shadow-sm">
+            <div class="section-head">
+              <h3 class="section-title mb-1">Detalle por categoría</h3>
+              <p class="section-subtitle mb-0">
+                Listado ordenado de publicaciones por categoría.
+              </p>
+            </div>
 
-
-    <!-- Charts -->
-    <div class="row g-4">
-
-      <div class="col-lg-6">
-
-        <div class="glass-card p-3">
-
-          <h5>Publicaciones por Categoría</h5>
-
-          <canvas id="postsChart"></canvas>
-
+            <div class="table-responsive mt-4">
+              <table class="table align-middle analytics-table mb-0">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Categoría</th>
+                    <th>Publicaciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of postsPerCategory; let i = index">
+                    <td>{{ i + 1 }}</td>
+                    <td>{{ item.name }}</td>
+                    <td>
+                      <span class="table-badge">{{ item.posts }}</span>
+                    </td>
+                  </tr>
+                  <tr *ngIf="postsPerCategory.length === 0">
+                    <td colspan="3" class="text-center py-4">
+                      No hay datos disponibles.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
-
       </div>
-
-
-      <div class="col-lg-6">
-
-        <div class="glass-card p-3">
-
-          <h5>Usuarios Activos</h5>
-
-          <canvas id="usersChart"></canvas>
-
-        </div>
-
-      </div>
-
-    </div>
-
-
-    <!-- Table -->
-    <div class="glass-card p-4 mt-4">
-
-      <h5 class="mb-3">
-        Métricas Detalladas
-      </h5>
-
-      <div class="row">
-
-        <div class="col-md-4">
-
-          <div class="metric-value">
-            5.3
-          </div>
-
-          <div class="metric-label">
-            Promedio comentarios por post
-          </div>
-
-        </div>
-
-
-        <div class="col-md-4">
-
-          <div class="metric-value">
-            2.4h
-          </div>
-
-          <div class="metric-label">
-            Tiempo promedio respuesta
-          </div>
-
-        </div>
-
-
-        <div class="col-md-4">
-
-          <div class="metric-value">
-            78%
-          </div>
-
-          <div class="metric-label">
-            Engagement
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
-
-
-  </div> <!-- container -->
-
-
-</div> <!-- analytics-root -->
+    </ng-container>
+  </section>
+</div>

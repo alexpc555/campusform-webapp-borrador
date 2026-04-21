@@ -32,5 +32,7 @@ export class ProfesorScreen {
   localStorage.removeItem('rol');
   this.router.navigate(['/login']);
 }
-
+irAnalytics() {
+  this.router.navigate(['/analytics-page']);
+}
 }

@@ -1,82 +1,74 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
+import { AnalyticsService, AnalyticsDashboardResponse } from '../../services/analytics.service';
+import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.services'; // ajusta ruta si es necesario
 @Component({
   selector: 'app-analytics-page',
-
   standalone: true,
-
   imports: [CommonModule],
-
   templateUrl: './analytics-page.html',
-
   styleUrls: ['./analytics-page.scss']
-
 })
-export class AnalyticsPageComponent {
+export class AnalyticsPageComponent implements OnInit {
+  private analyticsService = inject(AnalyticsService);
+  private router = inject(Router);
+ private auth = inject(AuthService);
+  loading = true;
+  error = '';
 
-  stats = [
+  stats: { label: string; value: string; icon: string }[] = [];
+  postsPerCategory: { name: string; posts: number }[] = [];
+  topUsers: { name: string; posts: number; comments: number; activity: number }[] = [];
 
-    {
-      label: 'Total Usuarios',
-      value: '2,605',
-      growth: '+12%',
-      icon: 'bi bi-people'
-    },
+  ngOnInit(): void {
+    this.analyticsService.getDashboard().subscribe({
+      next: (data: AnalyticsDashboardResponse) => {
+        this.stats = [
+          { label: 'Total Usuarios', value: String(data.summary.total_users), icon: 'bi bi-people' },
+          { label: 'Publicaciones', value: String(data.summary.total_posts), icon: 'bi bi-chat-left-text' },
+          { label: 'Comentarios', value: String(data.summary.total_comments), icon: 'bi bi-chat-dots' },
+          { label: 'Prom. comentarios/post', value: String(data.summary.avg_comments_per_post), icon: 'bi bi-graph-up' }
+        ];
 
-    {
-      label: 'Publicaciones',
-      value: '822',
-      growth: '+8%',
-      icon: 'bi bi-chat-left-text'
-    },
+        this.postsPerCategory = data.posts_per_category;
+        this.topUsers = data.top_users;
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error(err);
+        this.error = 'No se pudieron cargar las estadísticas.';
+        this.loading = false;
+      }
+    });
+    
+  }
+  volver() {
+  const role = this.auth.getRole();
 
-    {
-      label: 'Comentarios',
-      value: '4,327',
-      growth: '+18%',
-      icon: 'bi bi-graph-up'
-    },
+  if (role === 'admin') {
+    this.router.navigate(['/admin']);
+    return;
+  }
 
-    {
-      label: 'Vistas',
-      value: '28.5K',
-      growth: '+15%',
-      icon: 'bi bi-eye'
-    }
+  if (role === 'teacher') {
+    this.router.navigate(['/profesor']);
+    return;
+  }
 
-  ];
+  if (role === 'student') {
+    this.router.navigate(['/student-panel']);
+    return;
+  }
 
-  postsPerCategory = [
-
-    { name: "Matemáticas", posts: 245, color: "#002D62" },
-
-    { name: "Programación", posts: 189, color: "#C8A961" },
-
-    { name: "Física", posts: 156, color: "#3b82f6" },
-
-    { name: "Campus", posts: 98, color: "#8b5cf6" },
-
-    { name: "Tecnología", posts: 134, color: "#ec4899" }
-
-  ];
-
-  activeUsersData = [
-
-    { month: "Ago", students: 420 },
-
-    { month: "Sep", students: 580 },
-
-    { month: "Oct", students: 890 },
-
-    { month: "Nov", students: 1200 },
-
-    { month: "Dic", students: 1450 },
-
-    { month: "Ene", students: 2100 },
-
-    { month: "Feb", students: 2500 }
-
-  ];
-
+  // fallback
+  this.router.navigate(['/']);
+}
+getTextoVolver(): string {
+  const role = this.auth.getRole();
+  if (role === 'admin') return 'Volver a Admin';
+  if (role === 'teacher') return 'Volver a Profesor';
+  if (role === 'student') return 'Volver a Estudiante';
+  return 'Volver';
+}
 }
