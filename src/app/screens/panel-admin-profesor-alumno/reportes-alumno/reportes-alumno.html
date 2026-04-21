@@ -1,62 +1,149 @@
-<nav class="navbar navbar-expand-lg navbar-glass sticky-top border-bottom">
-  <div class="container py-2 position-relative">
-    <a class="navbar-brand d-flex align-items-center gap-2">
-      <span class="brand-icon">
-        <i class="bi bi-mortarboard-fill"></i>
-      </span>
-      <span class="brand-name">CampusForum</span>
-    </a>
+<div class="reportes-root">
+  <!-- Navbar -->
+  <nav class="navbar-glass">
+    <div class="navbar-container">
+      <a class="brand-wrapper">
+        <div class="brand-icon">
+          <i class="bi bi-mortarboard-fill"></i>
+        </div>
+        <span class="brand-name">CampusForum</span>
+      </a>
 
-    <div class="ms-auto d-flex align-items-center gap-2">
-      <button class="btn btn-outline-danger" (click)="volver()">
-        <i class="bi bi-arrow-left me-1"></i>
-        Volver
-      </button>
+      <div class="navbar-actions">
+        <span class="page-badge">
+          <i class="bi bi-flag-fill"></i>
+          Mis Reportes
+        </span>
+
+        <button class="btn-back" (click)="volver()">
+          <i class="bi bi-arrow-left"></i>
+          <span>Volver</span>
+        </button>
+      </div>
     </div>
-  </div>
-</nav>
+  </nav>
 
-<div class="feed-wrapper">
-  <div class="feed-header">
-    <div>
-      <h2>Historial de Reportes</h2>
-      <p>Revisa los reportes que has enviado</p>
-    </div>
-  </div>
-
-  <div class="posts-container">
-    <div *ngIf="loading" class="text-center py-5">
-      <p>Cargando reportes...</p>
-    </div>
-
-    <div *ngIf="errorMessage" class="alert alert-danger">
-      {{ errorMessage }}
-    </div>
-
-    <div class="post-card" *ngFor="let report of reports">
-      <div class="post-header">
-        <div class="avatar">RP</div>
-        <div>
-          <h4>{{ report.post_titulo }}</h4>
-          <p>{{ report.fecha_creacion | date:'short' }}</p>
+  <!-- Header Section -->
+  <section class="header-section">
+    <div class="container">
+      <div class="header-content fade-in-up">
+        <div class="header-icon">
+          <i class="bi bi-flag-fill"></i>
+        </div>
+        <div class="header-text">
+          <h1 class="header-title">Historial de Reportes</h1>
+          <p class="header-subtitle">Revisa el estado de los reportes que has enviado</p>
         </div>
       </div>
+    </div>
+  </section>
 
-      <p class="post-content mt-3">
-        <strong>Motivo:</strong> {{ report.motivo }}
-      </p>
+  <!-- Main Content -->
+  <section class="content-section">
+    <div class="container">
+      <!-- Loading State -->
+      <div class="loading-state fade-in-up" *ngIf="loading">
+        <div class="loading-spinner">
+          <div class="spinner-blue"></div>
+        </div>
+        <p class="loading-text">Cargando tus reportes...</p>
+      </div>
 
-      <p class="post-content">
-        {{ report.razon }}
-      </p>
+      <!-- Error Message -->
+      <div class="alert-error fade-in-up" *ngIf="errorMessage && !loading">
+        <i class="bi bi-exclamation-circle-fill"></i>
+        <span>{{ errorMessage }}</span>
+        <button class="retry-btn" (click)="loadReports()">
+          <i class="bi bi-arrow-repeat"></i>
+          Reintentar
+        </button>
+      </div>
 
-      <div class="post-footer d-flex justify-content-between align-items-center">
-        <span class="tag">{{ report.estado }}</span>
+      <!-- Empty State -->
+      <div class="empty-state fade-in-up" *ngIf="!loading && !errorMessage && reports.length === 0">
+        <div class="empty-icon-wrapper">
+          <i class="bi bi-flag"></i>
+        </div>
+        <h3 class="empty-title">Aún no has enviado reportes</h3>
+        <p class="empty-text">Cuando reportes contenido inapropiado, aparecerá aquí</p>
+        <button class="btn-create-secondary" routerLink="/dashboard">
+          <i class="bi bi-chat-dots"></i>
+          Ir al Foro
+        </button>
+      </div>
+
+      <!-- Reports Grid -->
+      <div class="reports-grid fade-in-up" *ngIf="!loading && !errorMessage && reports.length > 0">
+        <div class="stats-bar">
+          <div class="stats-count">
+            <i class="bi bi-flag"></i>
+            <span>{{ reports.length }} reporte{{ reports.length !== 1 ? 's' : '' }}</span>
+          </div>
+        </div>
+
+        <div class="report-card" *ngFor="let report of reports">
+          <div class="report-header">
+            <div class="report-avatar" [class]="getStatusClass(report.estado)">
+              <i class="bi bi-flag-fill"></i>
+            </div>
+            <div class="report-header-info">
+              <div class="report-title-row">
+                <h3 class="report-title">{{ report.post_titulo || 'Publicación reportada' }}</h3>
+                <span class="status-badge" [class]="getStatusBadgeClass(report.estado)">
+                  <i class="bi" [class]="getStatusIcon(report.estado)"></i>
+                  {{ getStatusName(report.estado) }}
+                </span>
+              </div>
+              <div class="report-meta">
+                <span class="meta-item">
+                  <i class="bi bi-calendar"></i>
+                  {{ report.fecha_creacion | date:'dd/MM/yyyy' }}
+                </span>
+                <span class="meta-item">
+                  <i class="bi bi-clock"></i>
+                  {{ report.fecha_creacion | date:'HH:mm' }}
+                </span>
+                <span class="meta-item" *ngIf="report.motivo">
+                  <i class="bi bi-tag"></i>
+                  {{ getMotivoName(report.motivo) }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="report-body">
+            <div class="report-section">
+              <div class="section-label">
+                <i class="bi bi-exclamation-triangle"></i>
+                Motivo del reporte
+              </div>
+              <p class="report-reason">{{ getMotivoName(report.motivo) || 'No especificado' }}</p>
+            </div>
+
+            <div class="report-section" *ngIf="report.razon">
+              <div class="section-label">
+                <i class="bi bi-chat-text"></i>
+                Descripción detallada
+              </div>
+              <div class="reason-content">
+                <i class="bi bi-quote quote-icon"></i>
+                <p class="report-description">{{ report.razon }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="report-footer">
+            <div class="footer-info">
+              <i class="bi bi-hash"></i>
+              <span>ID de reporte: #{{ report.id }}</span>
+            </div>
+            <div class="status-indicator" [class]="getStatusClass(report.estado)">
+              <span class="status-dot"></span>
+              <span>{{ getStatusDescription(report.estado) }}</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-
-    <div *ngIf="!loading && reports.length === 0" class="text-center py-5">
-      <p>Aún no has enviado reportes.</p>
-    </div>
-  </div>
+  </section>
 </div>

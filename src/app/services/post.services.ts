@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { AuthService } from './auth.services';
 import { environment } from '../../environments/environment';
+
 export interface Post {
   id: number;
   titulo: string;
@@ -14,7 +15,7 @@ export interface Post {
   autor_nombre?: string;
   etiquetas?: string;
   vistas: number;
-  comentarios_count?: number; // Agregar este campo opcional
+  comentarios_count?: number;
   fecha_creacion: string;
   fecha_actualizacion: string;
 }
@@ -30,7 +31,7 @@ export interface CreatePostPayload {
   providedIn: 'root'
 })
 export class PostService {
- private apiUrl = environment.apiUrl;
+  private apiUrl = environment.apiUrl;
 
   constructor(
     private http: HttpClient,
@@ -62,9 +63,12 @@ export class PostService {
   /** Obtener mis posts (solo los del usuario autenticado) */
   getMyPosts(): Observable<Post[]> {
     const url = `${this.apiUrl}/posts/mis-posts/`;
-    return this.http.get<Post[]>(url, { headers: this.authHeaders() }).pipe(
+    const headers = this.authHeaders();
+    console.log('🔐 Headers enviados a mis-posts:', headers);
+    console.log('🔑 Token:', this.auth.getToken());
+    return this.http.get<Post[]>(url, { headers }).pipe(
       catchError(error => {
-        console.error('Error en getMyPosts:', error);
+        console.error('❌ Error en getMyPosts:', error);
         return throwError(() => error);
       })
     );
@@ -136,14 +140,4 @@ export class PostService {
       })
     );
   }
-  
-
-
-
-
-
-
-
-
-
 }
